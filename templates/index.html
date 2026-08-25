@@ -1,0 +1,1503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduGraph AI — Zero-Knowledge Multi-Agent Learning Studio</title>
+    <meta name="description" content="Generate zero-knowledge educational guides, diagrams, and beautifully formatted PDFs with LangGraph multi-agent intelligence.">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Marked & Highlight.js for rich Markdown parsing -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+
+    <style>
+        :root {
+            --bg-primary: #0a0f1d;
+            --bg-secondary: #11182c;
+            --bg-tertiary: #19233e;
+            --bg-glass: rgba(17, 24, 44, 0.75);
+            --bg-glass-card: rgba(25, 35, 62, 0.65);
+            --border-color: rgba(255, 255, 255, 0.09);
+            --border-highlight: rgba(56, 189, 248, 0.35);
+            
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --text-dim: #64748b;
+            
+            --accent-cyan: #38bdf8;
+            --accent-blue: #3b82f6;
+            --accent-indigo: #818cf8;
+            --accent-purple: #a855f7;
+            --accent-emerald: #34d399;
+            --accent-amber: #fbbf24;
+            --accent-rose: #f43f5e;
+            
+            --gradient-brand: linear-gradient(135deg, #38bdf8 0%, #818cf8 50%, #c084fc 100%);
+            --gradient-accent: linear-gradient(135deg, #2563eb, #7c3aed);
+            --gradient-card: linear-gradient(145deg, rgba(30, 41, 69, 0.6), rgba(15, 23, 42, 0.8));
+            
+            --radius-sm: 8px;
+            --radius-md: 14px;
+            --radius-lg: 20px;
+            --radius-xl: 28px;
+            
+            --shadow-glow: 0 0 25px rgba(56, 189, 248, 0.15);
+            --shadow-subtle: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+            --shadow-card: 0 14px 35px -5px rgba(0, 0, 0, 0.6), 0 0 0 1px var(--border-color);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-main);
+            min-height: 100vh;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 15% 15%, rgba(56, 189, 248, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 85% 85%, rgba(168, 85, 247, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 50% 50%, rgba(30, 41, 69, 0.2) 0%, transparent 60%);
+            background-attachment: fixed;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Top Navigation Header */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(10, 15, 29, 0.85);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0.85rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .brand-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.85rem;
+            text-decoration: none;
+        }
+
+        .brand-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: var(--radius-md);
+            background: var(--gradient-brand);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            box-shadow: var(--shadow-glow);
+        }
+
+        .brand-text h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+            background: var(--gradient-brand);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.02em;
+        }
+
+        .brand-text p {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            font-weight: 500;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .badge-agent {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.35rem 0.8rem;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            background: rgba(56, 189, 248, 0.12);
+            color: var(--accent-cyan);
+            border: 1px solid rgba(56, 189, 248, 0.25);
+        }
+
+        .badge-agent .pulse-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--accent-cyan);
+            box-shadow: 0 0 8px var(--accent-cyan);
+            animation: pulseGlow 2s infinite;
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.4); opacity: 0.5; }
+        }
+
+        .btn-header {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--bg-tertiary);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            padding: 0.45rem 1rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.82rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-header:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--border-highlight);
+            transform: translateY(-1px);
+        }
+
+        /* Main App Layout */
+        .app-container {
+            flex: 1;
+            display: flex;
+            height: calc(100vh - 66px);
+            overflow: hidden;
+        }
+
+        /* Left History Sidebar */
+        .sidebar {
+            width: 320px;
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s ease;
+            z-index: 50;
+        }
+
+        .sidebar.collapsed {
+            width: 0;
+            transform: translateX(-100%);
+            border-right: none;
+        }
+
+        .sidebar-header {
+            padding: 1.25rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .sidebar-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .search-box {
+            padding: 0.85rem 1.25rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .search-input {
+            width: 100%;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            padding: 0.5rem 0.85rem;
+            font-size: 0.8rem;
+            color: var(--text-main);
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .search-input:focus {
+            border-color: var(--accent-cyan);
+        }
+
+        .doc-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0.85rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .doc-card {
+            background: var(--bg-glass-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            padding: 0.75rem 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+        }
+
+        .doc-card:hover {
+            border-color: var(--border-highlight);
+            background: rgba(56, 189, 248, 0.06);
+            transform: translateX(3px);
+        }
+
+        .doc-card.active {
+            border-color: var(--accent-cyan);
+            background: rgba(56, 189, 248, 0.12);
+        }
+
+        .doc-card-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-main);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .doc-card-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.7rem;
+            color: var(--text-dim);
+        }
+
+        /* Middle Workspace (Chat / Prompting) */
+        .workspace {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background: transparent;
+            position: relative;
+        }
+
+        .chat-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.75rem 2.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.75rem;
+            scroll-behavior: smooth;
+        }
+
+        /* Hero Welcome Panel */
+        .hero-banner {
+            background: var(--gradient-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 2.25rem;
+            text-align: center;
+            box-shadow: var(--shadow-card);
+            margin-bottom: 0.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-banner::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--gradient-brand);
+        }
+
+        .hero-banner h2 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 0.6rem;
+            background: linear-gradient(135deg, #ffffff 40%, #94a3b8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-banner p {
+            color: var(--text-muted);
+            font-size: 0.92rem;
+            max-width: 680px;
+            margin: 0 auto 1.5rem auto;
+            line-height: 1.5;
+        }
+
+        .agent-pipeline-preview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 0.85rem;
+            margin-top: 1.25rem;
+        }
+
+        .agent-step-card {
+            background: rgba(10, 15, 29, 0.6);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 0.85rem 0.6rem;
+            text-align: center;
+            font-size: 0.76rem;
+            transition: all 0.2s;
+        }
+
+        .agent-step-card:hover {
+            border-color: var(--border-highlight);
+            transform: translateY(-2px);
+        }
+
+        .agent-step-icon {
+            font-size: 1.4rem;
+            margin-bottom: 0.35rem;
+        }
+
+        .agent-step-name {
+            font-weight: 600;
+            color: var(--text-main);
+            margin-bottom: 0.2rem;
+        }
+
+        .agent-step-desc {
+            color: var(--text-dim);
+            font-size: 0.68rem;
+        }
+
+        /* Suggestions Pills */
+        .suggestions-bar {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            justify-content: center;
+        }
+
+        .suggestion-chip {
+            background: rgba(56, 189, 248, 0.08);
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            color: var(--accent-cyan);
+            padding: 0.4rem 0.85rem;
+            border-radius: 999px;
+            font-size: 0.78rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .suggestion-chip:hover {
+            background: rgba(56, 189, 248, 0.2);
+            border-color: var(--accent-cyan);
+            transform: translateY(-1px);
+        }
+
+        /* Messages */
+        .message-row {
+            display: flex;
+            gap: 1.1rem;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message-avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            flex-shrink: 0;
+        }
+
+        .avatar-user {
+            background: var(--gradient-accent);
+            box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
+        }
+
+        .avatar-ai {
+            background: var(--gradient-brand);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .message-content-wrapper {
+            flex: 1;
+            max-width: 920px;
+        }
+
+        .user-bubble {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            padding: 0.9rem 1.25rem;
+            border-radius: var(--radius-md);
+            font-size: 0.92rem;
+            font-weight: 500;
+            display: inline-block;
+            box-shadow: var(--shadow-subtle);
+        }
+
+        .ai-card {
+            background: var(--bg-glass-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 1.6rem 1.8rem;
+            box-shadow: var(--shadow-card);
+            backdrop-filter: blur(12px);
+            display: flex;
+            flex-direction: column;
+            gap: 1.1rem;
+        }
+
+        .ai-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.85rem;
+        }
+
+        .ai-card-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .ai-badges {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .badge-stat {
+            padding: 0.25rem 0.65rem;
+            border-radius: 999px;
+            font-size: 0.72rem;
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background: rgba(52, 211, 153, 0.15);
+            color: var(--accent-emerald);
+            border: 1px solid rgba(52, 211, 153, 0.3);
+        }
+
+        .badge-revision {
+            background: rgba(251, 191, 36, 0.15);
+            color: var(--accent-amber);
+            border: 1px solid rgba(251, 191, 36, 0.3);
+        }
+
+        .ai-actions-bar {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.65rem;
+            padding-top: 0.85rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .btn-action {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            padding: 0.5rem 0.95rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .btn-action-primary {
+            background: var(--gradient-accent);
+            color: #ffffff;
+            border: none;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+
+        .btn-action-primary:hover {
+            opacity: 0.92;
+            transform: translateY(-1px);
+        }
+
+        .btn-action-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-action-secondary:hover {
+            border-color: var(--border-highlight);
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateY(-1px);
+        }
+
+        /* Markdown Rendering Styles Inside AI Card */
+        .markdown-body {
+            color: #e2e8f0;
+            font-size: 0.94rem;
+            line-height: 1.7;
+        }
+
+        .markdown-body h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.45rem;
+            color: #38bdf8;
+            margin: 1.2rem 0 0.6rem 0;
+            border-bottom: 1px solid rgba(56, 189, 248, 0.2);
+            padding-bottom: 0.4rem;
+        }
+
+        .markdown-body h2 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.25rem;
+            color: #818cf8;
+            margin: 1rem 0 0.5rem 0;
+        }
+
+        .markdown-body h3 {
+            font-size: 1.05rem;
+            color: #a78bfa;
+            margin: 0.9rem 0 0.4rem 0;
+        }
+
+        .markdown-body p {
+            margin-bottom: 0.85rem;
+        }
+
+        .markdown-body ul, .markdown-body ol {
+            margin: 0.6rem 0 0.85rem 1.4rem;
+        }
+
+        .markdown-body li {
+            margin-bottom: 0.3rem;
+        }
+
+        .markdown-body blockquote {
+            background: rgba(56, 189, 248, 0.06);
+            border-left: 3.5px solid var(--accent-cyan);
+            padding: 0.75rem 1.1rem;
+            margin: 0.85rem 0;
+            border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+            color: #cbd5e1;
+        }
+
+        .markdown-body table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0.9rem 0;
+            font-size: 0.85rem;
+        }
+
+        .markdown-body th, .markdown-body td {
+            border: 1px solid var(--border-color);
+            padding: 0.6rem 0.85rem;
+            text-align: left;
+        }
+
+        .markdown-body th {
+            background: rgba(30, 41, 69, 0.7);
+            color: #38bdf8;
+            font-weight: 600;
+        }
+
+        .markdown-body pre {
+            background: #0f172a;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            padding: 0.9rem 1.1rem;
+            overflow-x: auto;
+            margin: 0.85rem 0;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.82rem;
+        }
+
+        .markdown-body code {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.82rem;
+            background: rgba(15, 23, 42, 0.6);
+            padding: 0.15rem 0.35rem;
+            border-radius: 4px;
+            color: #38bdf8;
+        }
+
+        /* Active Generation Progress Card */
+        .progress-card {
+            background: var(--bg-glass-card);
+            border: 1px solid var(--border-highlight);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-glow);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .progress-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .progress-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--accent-cyan);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .live-pipeline-stages {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.65rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .stage-box {
+            background: rgba(10, 15, 29, 0.6);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 0.75rem 0.5rem;
+            text-align: center;
+            font-size: 0.72rem;
+            transition: all 0.3s ease;
+        }
+
+        .stage-box.active {
+            border-color: var(--accent-cyan);
+            background: rgba(56, 189, 248, 0.12);
+            box-shadow: 0 0 14px rgba(56, 189, 248, 0.2);
+            animation: pulseGlow 2s infinite;
+        }
+
+        .stage-box.completed {
+            border-color: var(--accent-emerald);
+            background: rgba(52, 211, 153, 0.1);
+            color: var(--accent-emerald);
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            height: 6px;
+            background: var(--bg-tertiary);
+            border-radius: 999px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            width: 25%;
+            background: var(--gradient-brand);
+            border-radius: 999px;
+            transition: width 0.5s ease;
+        }
+
+        /* Bottom Input Workspace */
+        .input-bar-container {
+            padding: 1.25rem 2.5rem 1.5rem 2.5rem;
+            background: rgba(10, 15, 29, 0.85);
+            backdrop-filter: blur(16px);
+            border-top: 1px solid var(--border-color);
+        }
+
+        .input-form {
+            display: flex;
+            align-items: center;
+            gap: 0.85rem;
+            background: var(--bg-glass-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 0.4rem 0.6rem 0.4rem 1.25rem;
+            box-shadow: var(--shadow-card);
+            transition: all 0.2s ease;
+        }
+
+        .input-form:focus-within {
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 20px rgba(56, 189, 248, 0.2);
+        }
+
+        .prompt-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: var(--text-main);
+            font-size: 0.95rem;
+            font-family: inherit;
+            resize: none;
+            max-height: 120px;
+            padding: 0.4rem 0;
+        }
+
+        .btn-generate {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--gradient-brand);
+            color: #0b0f19;
+            border: none;
+            padding: 0.65rem 1.4rem;
+            border-radius: var(--radius-md);
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: var(--shadow-glow);
+            flex-shrink: 0;
+        }
+
+        .btn-generate:hover:not(:disabled) {
+            transform: scale(1.03);
+            filter: brightness(1.1);
+        }
+
+        .btn-generate:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            filter: grayscale(0.6);
+        }
+
+        /* Right Split PDF Viewer Panel */
+        .pdf-viewer-panel {
+            width: 0;
+            background: var(--bg-secondary);
+            border-left: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
+            z-index: 40;
+        }
+
+        .pdf-viewer-panel.open {
+            width: 50%;
+        }
+
+        .pdf-viewer-panel.fullscreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 1000;
+        }
+
+        .pdf-panel-header {
+            padding: 0.85rem 1.25rem;
+            border-bottom: 1px solid var(--border-color);
+            background: var(--bg-tertiary);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.5rem;
+        }
+
+        .pdf-panel-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.92rem;
+            font-weight: 700;
+            color: var(--text-main);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .pdf-panel-controls {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            flex-shrink: 0;
+        }
+
+        .btn-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: var(--radius-sm);
+            background: var(--bg-glass);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-icon:hover {
+            border-color: var(--border-highlight);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .pdf-iframe {
+            flex: 1;
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: #ffffff;
+        }
+
+        /* Toast notification */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--accent-cyan);
+            color: var(--text-main);
+            padding: 0.75rem 1.25rem;
+            border-radius: var(--radius-md);
+            font-size: 0.85rem;
+            font-weight: 500;
+            box-shadow: var(--shadow-card);
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 2000;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        /* Responsive Breakpoints */
+        @media (max-width: 1024px) {
+            .pdf-viewer-panel.open {
+                width: 100%;
+                position: absolute;
+                top: 0;
+                right: 0;
+                bottom: 0;
+                z-index: 100;
+            }
+            .sidebar {
+                position: absolute;
+                top: 0;
+                left: 0;
+                bottom: 0;
+                height: 100%;
+            }
+            .chat-container {
+                padding: 1.25rem;
+            }
+            .input-bar-container {
+                padding: 1rem 1.25rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Navigation -->
+    <header>
+        <div class="brand-logo">
+            <div class="brand-icon">🎓</div>
+            <div class="brand-text">
+                <h1>EduGraph AI</h1>
+                <p>Zero-Knowledge Multi-Agent Studio</p>
+            </div>
+        </div>
+
+        <div class="header-actions">
+            <div class="badge-agent">
+                <span class="pulse-dot"></span>
+                <span>LangGraph 4-Agent Pipeline</span>
+            </div>
+            <button class="btn-header" id="btnToggleSidebar" title="Toggle Document Library">
+                📚 <span>Library (<span id="libraryCount">0</span>)</span>
+            </button>
+            <button class="btn-header" id="btnTogglePdfPanel" title="Toggle PDF Viewer">
+                📄 <span>PDF Studio</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Workspace Container -->
+    <div class="app-container">
+        
+        <!-- Left Sidebar: Document Library -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-title">
+                    <span>📑 Generated Lessons</span>
+                </div>
+                <button class="btn-icon" id="btnRefreshDocs" title="Refresh list">🔄</button>
+            </div>
+
+            <div class="search-box">
+                <input type="text" id="searchInput" class="search-input" placeholder="Filter documents...">
+            </div>
+
+            <div class="doc-list" id="docList">
+                <!-- Populated dynamically via JS -->
+            </div>
+        </aside>
+
+        <!-- Center Workspace: Interactive Chat & Generator -->
+        <main class="workspace">
+            <div class="chat-container" id="chatContainer">
+                
+                <!-- Welcome Hero Card -->
+                <div class="hero-banner" id="heroBanner">
+                    <h2>Master Any Concept From Ground Zero</h2>
+                    <p>
+                        Type any topic or concept below. Our 4 specialized agents deconstruct it, write step-by-step beginner analogies, audit clarity, and polish formatted visual guides & downloadable PDFs.
+                    </p>
+
+                    <!-- Multi-Agent Pipeline Visualization -->
+                    <div class="agent-pipeline-preview">
+                        <div class="agent-step-card">
+                            <div class="agent-step-icon">🧠</div>
+                            <div class="agent-step-name">Concept Planner</div>
+                            <div class="agent-step-desc">Deconstructs roadmap for 0 prior knowledge</div>
+                        </div>
+                        <div class="agent-step-card">
+                            <div class="agent-step-icon">✍️</div>
+                            <div class="agent-step-name">Content Creator</div>
+                            <div class="agent-step-desc">Drafts concrete real-world analogies</div>
+                        </div>
+                        <div class="agent-step-card">
+                            <div class="agent-step-icon">🔍</div>
+                            <div class="agent-step-name">Quality Auditor</div>
+                            <div class="agent-step-desc">Strict zero-jargon beginner checks</div>
+                        </div>
+                        <div class="agent-step-card">
+                            <div class="agent-step-icon">✨</div>
+                            <div class="agent-step-name">Visual Polisher</div>
+                            <div class="agent-step-desc">Produces diagrams & styled PDF</div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Suggestions -->
+                    <div class="suggestions-bar">
+                        <span style="font-size: 0.76rem; color: var(--text-dim);">Try:</span>
+                        <button class="suggestion-chip" onclick="selectSuggestion('How Neural Networks Work')">🧠 How Neural Networks Work</button>
+                        <button class="suggestion-chip" onclick="selectSuggestion('What is JSON')">📦 What is JSON</button>
+                        <button class="suggestion-chip" onclick="selectSuggestion('How APIs Work')">🔌 How APIs Work</button>
+                        <button class="suggestion-chip" onclick="selectSuggestion('What is Recursion in Programming')">🔄 What is Recursion</button>
+                        <button class="suggestion-chip" onclick="selectSuggestion('Quantum Computing Explained Simply')">⚛️ Quantum Computing</button>
+                    </div>
+                </div>
+
+                <!-- Chat Messages History Container -->
+                <div id="messagesList" style="display: flex; flex-direction: column; gap: 1.5rem;"></div>
+
+                <!-- Active Pipeline Progress Card (Hidden by default) -->
+                <div class="progress-card" id="progressCard" style="display: none;">
+                    <div class="progress-header">
+                        <div class="progress-title">
+                            <span class="pulse-dot"></span>
+                            <span id="progressTopic">Generating lesson...</span>
+                        </div>
+                        <span style="font-size: 0.78rem; color: var(--text-muted);" id="progressTimer">Elapsed: 0s</span>
+                    </div>
+
+                    <div class="live-pipeline-stages">
+                        <div class="stage-box" id="stage1">
+                            <div style="font-size: 1.2rem;">🧠</div>
+                            <div style="font-weight: 600;">1. Roadmap</div>
+                        </div>
+                        <div class="stage-box" id="stage2">
+                            <div style="font-size: 1.2rem;">✍️</div>
+                            <div style="font-weight: 600;">2. Generator</div>
+                        </div>
+                        <div class="stage-box" id="stage3">
+                            <div style="font-size: 1.2rem;">🔍</div>
+                            <div style="font-weight: 600;">3. Auditor</div>
+                        </div>
+                        <div class="stage-box" id="stage4">
+                            <div style="font-size: 1.2rem;">✨</div>
+                            <div style="font-weight: 600;">4. Visual & PDF</div>
+                        </div>
+                    </div>
+
+                    <div class="progress-bar-container">
+                        <div class="progress-bar-fill" id="progressBarFill"></div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Bottom Prompt Input Workspace -->
+            <div class="input-bar-container">
+                <form class="input-form" id="generatorForm" onsubmit="handleGenerate(event)">
+                    <textarea 
+                        id="topicInput" 
+                        class="prompt-input" 
+                        rows="1" 
+                        placeholder="Ask anything you want to learn from scratch (e.g. 'How do Docker containers work?')..."
+                        required
+                    ></textarea>
+                    <button type="submit" class="btn-generate" id="btnGenerate">
+                        <span>🚀 Generate Lesson</span>
+                    </button>
+                </form>
+            </div>
+        </main>
+
+        <!-- Right Side Split Panel: Embedded PDF Viewer -->
+        <section class="pdf-viewer-panel" id="pdfPanel">
+            <div class="pdf-panel-header">
+                <div class="pdf-panel-title">
+                    <span>📄</span>
+                    <span id="pdfPanelHeading">Educational PDF Preview</span>
+                </div>
+                <div class="pdf-panel-controls">
+                    <a id="btnPdfDownload" href="#" download class="btn-icon" title="Download PDF">📥</a>
+                    <a id="btnPdfExternal" href="#" target="_blank" class="btn-icon" title="Open in New Tab">↗️</a>
+                    <button class="btn-icon" id="btnPdfFullscreen" title="Toggle Fullscreen">🗖</button>
+                    <button class="btn-icon" id="btnPdfClose" title="Close PDF Viewer">✕</button>
+                </div>
+            </div>
+            <iframe id="pdfFrame" class="pdf-iframe" src="about:blank"></iframe>
+        </section>
+
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+        <span id="toastIcon">✅</span>
+        <span id="toastMessage">Notification</span>
+    </div>
+
+    <script>
+        // State variables
+        let documentsList = [];
+        let activePdfUrl = null;
+        let isGenerating = false;
+        let timerInterval = null;
+        let elapsedSeconds = 0;
+
+        // Configure Marked.js with highlight.js
+        marked.setOptions({
+            highlight: function(code, lang) {
+                const language = highlight.getLanguage(lang) ? lang : 'plaintext';
+                return highlight.highlight(code, { language }).value;
+            },
+            langPrefix: 'hljs language-',
+            breaks: true,
+            gfm: true
+        });
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchDocuments();
+            setupEventListeners();
+            autoResizeTextarea();
+        });
+
+        function setupEventListeners() {
+            // Sidebar toggle
+            document.getElementById('btnToggleSidebar').addEventListener('click', () => {
+                document.getElementById('sidebar').classList.toggle('collapsed');
+            });
+
+            // PDF panel controls
+            document.getElementById('btnTogglePdfPanel').addEventListener('click', () => {
+                const panel = document.getElementById('pdfPanel');
+                panel.classList.toggle('open');
+            });
+
+            document.getElementById('btnPdfClose').addEventListener('click', () => {
+                document.getElementById('pdfPanel').classList.remove('open', 'fullscreen');
+            });
+
+            document.getElementById('btnPdfFullscreen').addEventListener('click', () => {
+                document.getElementById('pdfPanel').classList.toggle('fullscreen');
+            });
+
+            document.getElementById('btnRefreshDocs').addEventListener('click', fetchDocuments);
+
+            // Document search filter
+            document.getElementById('searchInput').addEventListener('input', (e) => {
+                const query = e.target.value.toLowerCase();
+                renderDocumentList(documentsList.filter(d => d.title.toLowerCase().includes(query)));
+            });
+
+            // Handle Shift+Enter vs Enter in textarea
+            const input = document.getElementById('topicInput');
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    document.getElementById('generatorForm').dispatchEvent(new Event('submit'));
+                }
+            });
+        }
+
+        function autoResizeTextarea() {
+            const input = document.getElementById('topicInput');
+            input.addEventListener('input', () => {
+                input.style.height = 'auto';
+                input.style.height = Math.min(input.scrollHeight, 120) + 'px';
+            });
+        }
+
+        function showToast(message, icon = '✅') {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastIcon').textContent = icon;
+            document.getElementById('toastMessage').textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3200);
+        }
+
+        function selectSuggestion(topic) {
+            const input = document.getElementById('topicInput');
+            input.value = topic;
+            input.focus();
+            input.style.height = 'auto';
+            input.style.height = input.scrollHeight + 'px';
+        }
+
+        // Fetch document library
+        async function fetchDocuments() {
+            try {
+                const res = await fetch('/api/documents');
+                if (!res.ok) throw new Error('Failed to fetch documents');
+                const data = await res.json();
+                documentsList = data.documents || [];
+                document.getElementById('libraryCount').textContent = documentsList.length;
+                renderDocumentList(documentsList);
+            } catch (err) {
+                console.error('Error fetching documents:', err);
+            }
+        }
+
+        function renderDocumentList(docs) {
+            const container = document.getElementById('docList');
+            container.innerHTML = '';
+
+            if (docs.length === 0) {
+                container.innerHTML = '<div style="color: var(--text-dim); font-size: 0.8rem; text-align: center; padding: 1.5rem;">No documents generated yet.</div>';
+                return;
+            }
+
+            docs.forEach(doc => {
+                const card = document.createElement('div');
+                card.className = 'doc-card';
+                if (activePdfUrl && activePdfUrl.includes(doc.pdf_filename)) {
+                    card.classList.add('active');
+                }
+
+                card.innerHTML = `
+                    <div class="doc-card-title">📖 ${doc.title}</div>
+                    <div class="doc-card-meta">
+                        <span>${doc.modified_time || ''}</span>
+                        <span>${doc.size_kb} KB</span>
+                    </div>
+                `;
+
+                card.addEventListener('click', () => {
+                    openPdfInViewer(doc.pdf_url, doc.title);
+                    highlightActiveCard(doc.pdf_filename);
+                    // Automatically collapse the left sidebar (generated lessons library)
+                    document.getElementById('sidebar').classList.add('collapsed');
+                });
+
+                container.appendChild(card);
+            });
+        }
+
+        function highlightActiveCard(filename) {
+            const cards = document.querySelectorAll('.doc-card');
+            cards.forEach(card => card.classList.remove('active'));
+            // re-render or class toggle
+        }
+
+        // Open PDF in Split Panel
+        function openPdfInViewer(url, title = 'Educational Guide') {
+            activePdfUrl = url;
+            const panel = document.getElementById('pdfPanel');
+            const frame = document.getElementById('pdfFrame');
+            const heading = document.getElementById('pdfPanelHeading');
+            const downloadBtn = document.getElementById('btnPdfDownload');
+            const externalBtn = document.getElementById('btnPdfExternal');
+
+            heading.textContent = title;
+            frame.src = url;
+            downloadBtn.href = `${url}?download=true`;
+            externalBtn.href = url;
+
+            panel.classList.add('open');
+            showToast(`Loaded: ${title}`, '📄');
+        }
+
+        // Trigger Generation
+        async function handleGenerate(event) {
+            event.preventDefault();
+            const input = document.getElementById('topicInput');
+            const topic = input.value.trim();
+            if (!topic || isGenerating) return;
+
+            // Reset input
+            input.value = '';
+            input.style.height = 'auto';
+
+            // Add user message to UI
+            appendUserMessage(topic);
+
+            // Start Generation Progress
+            startGenerationProgress(topic);
+
+            try {
+                const response = await fetch('/api/generate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ topic: topic, recursion_limit: 15 })
+                });
+
+                if (!response.ok) {
+                    const errData = await response.json();
+                    throw new Error(errData.detail || 'Generation request failed');
+                }
+
+                const result = await response.json();
+                stopGenerationProgress();
+
+                // Append AI Response
+                appendAiMessage(result);
+
+                // Refresh Document library
+                await fetchDocuments();
+
+                // Open PDF in Viewer automatically
+                if (result.pdf_url) {
+                    openPdfInViewer(result.pdf_url, result.topic);
+                }
+
+                showToast('Lesson & PDF successfully generated!', '🎉');
+
+            } catch (err) {
+                stopGenerationProgress();
+                showToast(`Error: ${err.message}`, '⚠️');
+                appendErrorMessage(topic, err.message);
+            }
+        }
+
+        function appendUserMessage(topic) {
+            const list = document.getElementById('messagesList');
+            const row = document.createElement('div');
+            row.className = 'message-row';
+            row.innerHTML = `
+                <div class="message-avatar avatar-user">👤</div>
+                <div class="message-content-wrapper">
+                    <div class="user-bubble">${escapeHtml(topic)}</div>
+                </div>
+            `;
+            list.appendChild(row);
+            scrollToBottom();
+        }
+
+        function appendAiMessage(data) {
+            const list = document.getElementById('messagesList');
+            const row = document.createElement('div');
+            row.className = 'message-row';
+
+            const parsedHtml = marked.parse(data.final_content || '');
+
+            row.innerHTML = `
+                <div class="message-avatar avatar-ai">🎓</div>
+                <div class="message-content-wrapper">
+                    <div class="ai-card">
+                        <div class="ai-card-header">
+                            <div class="ai-card-title">
+                                <span>📚 ${escapeHtml(data.topic)}</span>
+                            </div>
+                            <div class="ai-badges">
+                                <span class="badge-stat badge-success">✨ Zero-Knowledge Certified</span>
+                                <span class="badge-stat badge-revision">🔄 ${data.revision_count} Revision(s)</span>
+                            </div>
+                        </div>
+
+                        <div class="markdown-body">
+                            ${parsedHtml}
+                        </div>
+
+                        <div class="ai-actions-bar">
+                            ${data.pdf_url ? `
+                                <button class="btn-action btn-action-primary" onclick="openPdfInViewer('${data.pdf_url}', '${escapeHtml(data.topic)}')">
+                                    📄 View in Split Viewer
+                                </button>
+                                <a class="btn-action btn-action-secondary" href="${data.pdf_url}?download=true" download>
+                                    📥 Download PDF
+                                </a>
+                                <a class="btn-action btn-action-secondary" href="${data.pdf_url}" target="_blank">
+                                    ↗️ Open in New Tab
+                                </a>
+                            ` : ''}
+                            <button class="btn-action btn-action-secondary" onclick="copyToClipboard(\`${escapeForAttribute(data.final_content)}\`)">
+                                📋 Copy Markdown
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            list.appendChild(row);
+            scrollToBottom();
+        }
+
+        function appendErrorMessage(topic, errorMsg) {
+            const list = document.getElementById('messagesList');
+            const row = document.createElement('div');
+            row.className = 'message-row';
+            row.innerHTML = `
+                <div class="message-avatar" style="background: var(--accent-rose);">⚠️</div>
+                <div class="message-content-wrapper">
+                    <div class="ai-card" style="border-color: var(--accent-rose);">
+                        <div class="ai-card-title" style="color: var(--accent-rose);">Generation Error</div>
+                        <p style="color: var(--text-muted); font-size: 0.9rem;">
+                            Failed to generate educational lesson for <strong>${escapeHtml(topic)}</strong>.
+                        </p>
+                        <p style="font-family: monospace; font-size: 0.8rem; background: rgba(0,0,0,0.4); padding: 0.5rem; border-radius: 4px; color: #fda4af;">
+                            ${escapeHtml(errorMsg)}
+                        </p>
+                    </div>
+                </div>
+            `;
+            list.appendChild(row);
+            scrollToBottom();
+        }
+
+        // Pipeline stage simulation animation
+        function startGenerationProgress(topic) {
+            isGenerating = true;
+            document.getElementById('btnGenerate').disabled = true;
+            const progressCard = document.getElementById('progressCard');
+            document.getElementById('progressTopic').textContent = `Building zero-knowledge lesson for: "${topic}"...`;
+            progressCard.style.display = 'block';
+
+            elapsedSeconds = 0;
+            document.getElementById('progressTimer').textContent = 'Elapsed: 0s';
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                elapsedSeconds++;
+                document.getElementById('progressTimer').textContent = `Elapsed: ${elapsedSeconds}s`;
+            }, 1000);
+
+            // Stage animation loop
+            const stages = ['stage1', 'stage2', 'stage3', 'stage4'];
+            stages.forEach(s => {
+                const el = document.getElementById(s);
+                el.className = 'stage-box';
+            });
+
+            document.getElementById('stage1').classList.add('active');
+            document.getElementById('progressBarFill').style.width = '25%';
+
+            setTimeout(() => {
+                if (!isGenerating) return;
+                document.getElementById('stage1').className = 'stage-box completed';
+                document.getElementById('stage2').className = 'stage-box active';
+                document.getElementById('progressBarFill').style.width = '50%';
+            }, 4000);
+
+            setTimeout(() => {
+                if (!isGenerating) return;
+                document.getElementById('stage2').className = 'stage-box completed';
+                document.getElementById('stage3').className = 'stage-box active';
+                document.getElementById('progressBarFill').style.width = '75%';
+            }, 9000);
+
+            setTimeout(() => {
+                if (!isGenerating) return;
+                document.getElementById('stage3').className = 'stage-box completed';
+                document.getElementById('stage4').className = 'stage-box active';
+                document.getElementById('progressBarFill').style.width = '90%';
+            }, 15000);
+
+            scrollToBottom();
+        }
+
+        function stopGenerationProgress() {
+            isGenerating = false;
+            document.getElementById('btnGenerate').disabled = false;
+            clearInterval(timerInterval);
+            const progressCard = document.getElementById('progressCard');
+            progressCard.style.display = 'none';
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showToast('Markdown copied to clipboard!', '📋');
+            }).catch(err => {
+                showToast('Failed to copy text', '⚠️');
+            });
+        }
+
+        function scrollToBottom() {
+            const container = document.getElementById('chatContainer');
+            setTimeout(() => {
+                container.scrollTop = container.scrollHeight;
+            }, 50);
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            return text
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        function escapeForAttribute(text) {
+            if (!text) return '';
+            return text.replace(/\\/g, '\\\\').replace(/`/g, '\\`').replace(/\$/g, '\\$');
+        }
+    </script>
+</body>
+</html>
