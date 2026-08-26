@@ -145,7 +145,7 @@ def get_llm() -> BaseChatModel:
     elif os.getenv("GOOGLE_API_KEY") or os.getenv("GEMINI_API_KEY"):
         from langchain_google_genai import ChatGoogleGenerativeAI
         api_key = os.getenv("GOOGLE_API_KEY") or os.getenv("GEMINI_API_KEY")
-        return ChatGoogleGenerativeAI(model="gemini-3.5-flash-lite", google_api_key=api_key, temperature=0.7)
+        return ChatGoogleGenerativeAI(model="gemini-3.6-flash", google_api_key=api_key, temperature=0.7)
     else:
         # Default fallback to ChatOpenAI (will prompt user for API key at runtime if missing)
         from langchain_openai import ChatOpenAI

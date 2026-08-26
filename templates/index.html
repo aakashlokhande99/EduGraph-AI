@@ -261,6 +261,7 @@
             display: flex;
             flex-direction: column;
             gap: 0.35rem;
+            position: relative;
         }
 
         .doc-card:hover {
@@ -274,6 +275,13 @@
             background: rgba(56, 189, 248, 0.12);
         }
 
+        .doc-card-header-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.4rem;
+        }
+
         .doc-card-title {
             font-size: 0.85rem;
             font-weight: 600;
@@ -281,6 +289,33 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            flex: 1;
+        }
+
+        .doc-delete-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-dim);
+            font-size: 0.8rem;
+            cursor: pointer;
+            padding: 0.2rem 0.35rem;
+            border-radius: 4px;
+            opacity: 0.45;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .doc-card:hover .doc-delete-btn {
+            opacity: 1;
+        }
+
+        .doc-delete-btn:hover {
+            color: var(--accent-rose);
+            background: rgba(244, 63, 94, 0.2);
+            transform: scale(1.15);
         }
 
         .doc-card-meta {
@@ -1253,8 +1288,8 @@
             <button class="btn-header btn-memory" id="btnOpenMemory" title="Inspect Shared Agent Memory & Continuous Learning">
                 🧠 <span>Agent Memory (<span id="memoryInsightsCount">--</span>)</span>
             </button>
-            <button class="btn-header" id="btnToggleSidebar" title="Toggle Document Library">
-                📚 <span>Library (<span id="libraryCount">0</span>)</span>
+            <button class="btn-header" id="btnToggleSidebar" title="Toggle Generated Lessons Library">
+                📚 <span>Generated Lessons (<span id="libraryCount">0</span>)</span>
             </button>
             <button class="btn-header" id="btnTogglePdfPanel" title="Toggle PDF Viewer">
                 📄 <span>PDF Studio</span>
@@ -1267,11 +1302,14 @@
         
         <!-- Left Sidebar: Document Library -->
         <aside class="sidebar" id="sidebar">
-            <div class="sidebar-header">
-                <div class="sidebar-title">
+            <div class="sidebar-header" id="sidebarHeader" style="cursor: pointer;" title="Click to collapse / expand Generated Lessons">
+                <div class="sidebar-title" id="btnSidebarTitle">
                     <span>📑 Generated Lessons</span>
                 </div>
-                <button class="btn-icon" id="btnRefreshDocs" title="Refresh list">🔄</button>
+                <div style="display: flex; align-items: center; gap: 0.35rem;">
+                    <button class="btn-icon" id="btnRefreshDocs" title="Refresh list" onclick="event.stopPropagation(); fetchDocuments();">🔄</button>
+                    <button class="btn-icon" id="btnCollapseSidebar" title="Collapse sidebar" onclick="event.stopPropagation(); toggleSidebar();">◀</button>
+                </div>
             </div>
 
             <div class="search-box">
@@ -1569,11 +1607,18 @@
             autoResizeTextarea();
         });
 
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('collapsed');
+        }
+
         function setupEventListeners() {
-            // Sidebar toggle
-            document.getElementById('btnToggleSidebar').addEventListener('click', () => {
-                document.getElementById('sidebar').classList.toggle('collapsed');
-            });
+            // Sidebar toggle from header or sidebar title
+            document.getElementById('btnToggleSidebar').addEventListener('click', toggleSidebar);
+            
+            const btnSidebarTitle = document.getElementById('btnSidebarTitle');
+            if (btnSidebarTitle) {
+                btnSidebarTitle.addEventListener('click', toggleSidebar);
+            }
 
             // PDF panel controls
             document.getElementById('btnTogglePdfPanel').addEventListener('click', () => {
@@ -1906,7 +1951,10 @@
                 }
 
                 card.innerHTML = `
-                    <div class="doc-card-title">📖 ${doc.title}</div>
+                    <div class="doc-card-header-row">
+                        <div class="doc-card-title" title="${escapeHtml(doc.title)}">📖 ${escapeHtml(doc.title)}</div>
+                        <button class="doc-delete-btn" title="Delete document" onclick="deleteDocument('${escapeForAttribute(doc.pdf_filename)}', event)">🗑️</button>
+                    </div>
                     <div class="doc-card-meta">
                         <span>${doc.modified_time || ''}</span>
                         <span>${doc.size_kb} KB</span>
@@ -1921,6 +1969,39 @@
 
                 container.appendChild(card);
             });
+        }
+
+        async function deleteDocument(filename, event) {
+            if (event) {
+                event.stopPropagation();
+            }
+            if (!confirm(`Are you sure you want to delete "${filename}"?`)) {
+                return;
+            }
+
+            try {
+                const res = await fetch(`/api/documents/${encodeURIComponent(filename)}`, {
+                    method: 'DELETE'
+                });
+
+                if (!res.ok) {
+                    const errData = await res.json();
+                    throw new Error(errData.detail || 'Failed to delete document');
+                }
+
+                showToast('Document deleted successfully', '🗑️');
+
+                if (activePdfUrl && activePdfUrl.includes(filename)) {
+                    activePdfUrl = null;
+                    document.getElementById('pdfFrame').src = 'about:blank';
+                    document.getElementById('pdfPanelHeading').textContent = 'Educational PDF Preview';
+                    document.getElementById('pdfPanel').classList.remove('open', 'fullscreen');
+                }
+
+                await fetchDocuments();
+            } catch (err) {
+                showToast(`Error: ${err.message}`, '⚠️');
+            }
         }
 
         function highlightActiveCard(filename) {
@@ -2010,8 +2091,6 @@
             const lessonId = 'lesson_' + Date.now();
             lessonRatings[lessonId] = 5;
 
-            const parsedHtml = marked.parse(data.final_content || '');
-
             row.innerHTML = `
                 <div class="message-avatar avatar-ai">🎓</div>
                 <div class="message-content-wrapper">
@@ -2026,14 +2105,22 @@
                             </div>
                         </div>
 
-                        <div class="markdown-body">
-                            ${parsedHtml}
+                        <div style="padding: 0.75rem 0 0.5rem 0; color: var(--text-muted); font-size: 0.88rem; line-height: 1.6;">
+                            <p>🎉 Zero-knowledge educational guide and styled PDF compiled successfully! All concepts deconstructed with beginner analogies and visual diagrams.</p>
+                            ${data.concepts && data.concepts.length > 0 ? `
+                                <div style="margin-top: 0.65rem; background: rgba(30, 41, 69, 0.45); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 0.6rem 0.85rem;">
+                                    <div style="font-weight: 600; color: var(--accent-cyan); font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.35rem;">🧠 Concept Milestones Mastered:</div>
+                                    <ul style="padding-left: 1.2rem; font-size: 0.8rem; color: #cbd5e1; display: flex; flex-direction: column; gap: 0.25rem;">
+                                        ${data.concepts.slice(0, 5).map(c => `<li>${escapeHtml(c.replace(/^[#*-0-9. ]+/, ''))}</li>`).join('')}
+                                    </ul>
+                                </div>
+                            ` : ''}
                         </div>
 
-                        <div class="ai-actions-bar">
+                        <div class="ai-actions-bar" style="border-top: 1px solid var(--border-color); padding-top: 0.85rem;">
                             ${data.pdf_url ? `
                                 <button class="btn-action btn-action-primary" onclick="openPdfInViewer('${data.pdf_url}', '${escapeHtml(data.topic)}')">
-                                    📄 View in Split Viewer
+                                    📄 View PDF in Studio
                                 </button>
                                 <a class="btn-action btn-action-secondary" href="${data.pdf_url}?download=true" download>
                                     📥 Download PDF
@@ -2042,9 +2129,6 @@
                                     ↗️ Open in New Tab
                                 </a>
                             ` : ''}
-                            <button class="btn-action btn-action-secondary" onclick="copyToClipboard(\`${escapeForAttribute(data.final_content)}\`)">
-                                📋 Copy Markdown
-                            </button>
                         </div>
 
                         <!-- Interactive Student Feedback Card (Trains Shared Agent Memory) -->

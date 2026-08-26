@@ -95,6 +95,50 @@ async def list_documents():
         raise HTTPException(status_code=500, detail=f"Failed to fetch documents: {str(e)}")
 
 
+@app.delete("/api/documents/{filename}")
+async def delete_document(filename: str):
+    """
+    Deletes a generated PDF document (and any associated markdown file) from the output directory.
+    """
+    safe_filename = os.path.basename(filename)
+    pdf_path = os.path.join(OUTPUT_DIR, safe_filename)
+    deleted = False
+
+    if os.path.exists(pdf_path):
+        try:
+            os.remove(pdf_path)
+            deleted = True
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Failed to delete '{safe_filename}': {str(e)}")
+
+    # Check for possible accompanying .md file
+    base_name = os.path.splitext(safe_filename)[0]
+    md_path = os.path.join(OUTPUT_DIR, f"{base_name}.md")
+    if os.path.exists(md_path):
+        try:
+            os.remove(md_path)
+            deleted = True
+        except Exception:
+            pass
+
+    # Root level fallback check
+    if os.path.exists(safe_filename):
+        try:
+            os.remove(safe_filename)
+            deleted = True
+        except Exception:
+            pass
+
+    if not deleted:
+        raise HTTPException(status_code=404, detail=f"Document '{safe_filename}' not found.")
+
+    return {
+        "status": "success",
+        "message": f"Document '{safe_filename}' deleted successfully.",
+        "filename": safe_filename
+    }
+
+
 @app.post("/api/generate", response_model=GenerateResponse)
 async def generate_lesson(req: GenerateRequest):
     """
