@@ -1,6 +1,6 @@
-# 🎓 EduGraph AI — Zero-Knowledge Multi-Agent Educational Studio
+# 🎓 EduGraph AI — Zero-Knowledge Multi-Agent Learning Studio
 
-A **LangGraph** multi-agent educational pipeline and **FastAPI** web application designed to generate comprehensive, beginner-friendly learning guides and styled PDF documents for learners starting with **zero prior knowledge**.
+A **LangGraph** multi-agent educational pipeline and **FastAPI** web application designed to generate comprehensive, beginner-friendly learning guides and styled PDF documents for learners starting with **zero prior knowledge**, powered by **Shared Persistent Memory** for continuous feedback learning over time.
 
 ---
 
@@ -11,13 +11,19 @@ flowchart TD
     subgraph Frontend["🖥️ Web Application (FastAPI + Vanilla UI)"]
         UI["🎨 Interactive Chat & Studio UI\n(Outfit + Inter Glassmorphism)"]
         PDFViewer["📄 Split-Screen PDF Viewer\n(In-Browser Preview & Download)"]
-        Library["📚 Generated Lessons Library\n(Auto-Collapsing Drawer)"]
+        MemoryModal["🧠 Shared Memory Inspector\n(Live Guidelines, Stats, Critique Log)"]
+        FeedbackWidget["⭐ Interactive Student Rating & Feedback\n(Continuous Learning Loop)"]
+    end
+
+    subgraph MemoryLayer["🧠 Shared Persistent Memory (agent_memory.py)"]
+        Store[("memory/agent_memory.json\n- Global Pedagogical Principles\n- Agent #1-#4 Guidelines & Pitfalls\n- Evaluator Critique Memory\n- Student Feedback History")]
     end
 
     subgraph Backend["⚡ FastAPI Backend (main.py)"]
         API_Gen["POST /api/generate"]
         API_Docs["GET /api/documents"]
         API_PDF["GET /api/pdf/{filename}"]
+        API_Mem["GET /api/memory\nPOST /api/memory/feedback"]
     end
 
     subgraph LangGraphCore["🧠 LangGraph Multi-Agent Engine (education_system.py)"]
@@ -35,8 +41,18 @@ flowchart TD
         OutputPDFs[("Output/*.pdf\n(Direct PDF Generation)")]
     end
 
+    Store -.->|"Inject Context"| A1
+    Store -.->|"Inject Analogies & Avoid Pitfalls"| A2
+    Store -.->|"Inject Quality Standards"| A3
+    Store -.->|"Inject Visual Patterns"| A4
+    A3 -.->|"Record Critique Learning"| Store
+    A4 -.->|"Record Success Learning"| Store
+
     UI --> API_Gen
     UI --> API_Docs
+    FeedbackWidget --> API_Mem
+    MemoryModal --> API_Mem
+    API_Mem --> Store
     PDFViewer --> API_PDF
     API_Gen --> LangGraphCore
     API_Docs --> Storage
@@ -46,41 +62,35 @@ flowchart TD
 
 ---
 
-## 🤖 Agent Roles & Multi-Agent Pipeline
+## 🧠 Shared Persistent Memory & Feedback Learning
 
-The generation pipeline coordinates 4 specialized agents in a recursive state graph:
+EduGraph AI incorporates a cross-agent memory bank (`agent_memory.py` $\rightarrow$ `memory/agent_memory.json`) that learns from every generation and feedback cycle:
 
-1. **🧠 Agent #1: Concept Planner**
-   - Deconstructs the input topic into an intuitive step-by-step learning roadmap.
-   - Breaks concepts down into granular sub-concepts tailored for an absolute beginner with zero background knowledge.
+1. **Persistent Pedagogical Guidelines**:
+   - **Agent #1 (Concept Planner)**: Learned concept roadmaps, progressive prerequisite sequencing, and zero-assumption title formatting.
+   - **Agent #2 (Content Generator)**: Proven analogy models (kitchens, traffic, post offices), plain-English definitions, and avoidance of domain jargon.
+   - **Agent #3 (Pedagogical Evaluator)**: Strict zero-knowledge auditing standards, jargon-scanning rules, and actionable remediation feedback.
+   - **Agent #4 (Visual Enhancer)**: Standardized Mermaid diagram workflows and category-specific callout quotes (`> 💡 Intuition`, `> 🎯 Example`, `> ⚠️ Pitfall`).
 
-2. **✍️ Agent #2: Content & Analogy Generator**
-   - Drafts the comprehensive educational lesson.
-   - Explains core concepts using relatable real-world analogies (cooking, sports, daily life) and concrete step-by-step examples.
-   - Incorporates critique feedback from Agent #3 when looped for revision.
+2. **Automated Critique Absorption**:
+   - When Agent #3 rejects a draft, the critique is distilled into a succinct lesson and recorded in persistent memory so all agents avoid repeating the mistake on subsequent runs.
 
-3. **🔍 Agent #3: Pedagogical Evaluator (Quality Auditor)**
-   - Audits the draft against 4 strict beginner criteria: *Zero-Knowledge Accessibility*, *Intuitive Analogies*, *Concrete Examples*, and *Logical Flow*.
-   - Uses structured Pydantic outputs (`EvaluationResult`).
-   - If satisfactory $\rightarrow$ routes forward to Agent #4.
-   - If unsatisfactory $\rightarrow$ generates constructive critique notes and loops back to Agent #2.
+3. **Student / Human Feedback Loop**:
+   - Learners can rate generated lessons (1–5 stars) and submit comments directly from the UI.
+   - Praise reinforces effective explanation patterns; constructive critique adds specific avoidance rules to agent memory.
 
-4. **✨ Agent #4: Visual & Language Enhancer**
-   - Applies Markdown structure, stylized callout boxes (`> 💡 Key Concept`, `> ⚠️ Common Pitfall`), and visual Mermaid / ASCII diagrams.
-   - Polishes language to ensure an engaging, conversational, and intuitive tone.
-
-5. **📄 In-Memory PDF Engine (`convert_markdown_text_to_pdf`)**
-   - Converts the finalized Markdown content directly to a styled A4 PDF document in memory using `xhtml2pdf`.
-   - Saves only the PDF document to the `Output/` folder without writing intermediate `.md` files to disk.
+4. **Live Memory Inspector & Statistics**:
+   - In-app modal visualizes total lessons generated, critiques absorbed, active guidelines, student ratings, and detailed agent rule sets.
 
 ---
 
-## 💻 Web Application Features (`main.py`)
+## 🤖 Agent Roles & Multi-Agent Pipeline
 
-- **Interactive Multi-Agent Chat**: Real-time progress visualizer simulating active agent stages (Roadmap -> Drafting -> Audit -> Visuals).
-- **Split-Screen PDF Studio**: In-app embedded PDF viewer with one-click full-screen toggle, download, and new-tab preview.
-- **Auto-Collapsing Lessons Library**: Side drawer indexing all previously generated PDFs in `Output/` with instant search filter; clicking any lesson tile automatically loads the PDF and collapses the sidebar to maximize reading area.
-- **Dark Glassmorphism Design**: High-aesthetic UI featuring Outfit & Inter typography, glowing neon accents, and responsive layout.
+1. **🧠 Agent #1: Concept Planner**: Deconstructs the topic into a progressive zero-knowledge roadmap.
+2. **✍️ Agent #2: Content & Analogy Generator**: Drafts comprehensive lessons with concrete real-world analogies.
+3. **🔍 Agent #3: Pedagogical Evaluator**: High-standard auditor verifying clarity, analogies, and smooth flow; loops back to Agent #2 if revisions are required.
+4. **✨ Agent #4: Visual & Language Enhancer**: Formats content with Mermaid flowcharts, tables, callout blocks, and conversational polish.
+5. **📄 In-Memory PDF Engine**: Renders styled A4 PDF documents directly into `Output/`.
 
 ---
 
@@ -92,92 +102,44 @@ The generation pipeline coordinates 4 specialized agents in a recursive state gr
 | `POST` | `/api/generate` | Generates educational content and PDF asynchronously (`{ "topic": "..." }`) |
 | `GET` | `/api/documents` | Lists all available generated PDF lessons with metadata and file sizes |
 | `GET` | `/api/pdf/{filename}` | Streams the requested PDF with `inline` or `attachment` headers |
+| `GET` | `/api/memory` | Returns memory stats, active guidelines, critique history, and student feedback |
+| `POST` | `/api/memory/feedback` | Submits student ratings & comments, updating shared persistent memory |
+| `POST` | `/api/memory/reset` | Resets persistent memory to baseline zero-knowledge seed rules |
 | `GET` | `/api/health` | Service health status and API key configuration check |
-
----
-
-## 📦 Python Module Usage
-
-`education_system.py` can be imported as a module in any Python application:
-
-```python
-import education_system
-
-# 1. Generate educational lesson and PDF
-result = education_system.generate_educational_content(
-    topic="What is DNS",
-    output_folder="Output",
-    recursion_limit=15
-)
-
-print(result["topic"])
-print(result["pdf_path"])       # e.g., Output/education_what_is_dns.pdf
-print(result["revision_count"]) # Number of evaluator revision cycles
-print(result["final_content"])  # Final polished Markdown text
-
-# 2. Retrieve available generated documents
-docs = education_system.get_available_documents(output_folder="Output")
-for doc in docs:
-    print(f"- {doc['title']} ({doc['size_kb']} KB) -> {doc['pdf_path']}")
-```
 
 ---
 
 ## 🚀 Setup & Getting Started
 
-### 1. Clone & Install Dependencies
-
 ```bash
-git clone <repository-url>
-cd GenAI_NxtWave
-
-# Create & activate virtual environment (optional)
-python -m venv .venv
+# 1. Activate virtual environment
 .\.venv\Scripts\activate
 
-# Install dependencies
+# 2. Install dependencies
 pip install -r requirements.txt
-```
 
-### 2. Configure API Keys
-
-Create or edit your `.env` file with either OpenAI or Google Gemini API keys:
-
-```env
-# Google Gemini (Recommended)
+# 3. Configure .env
 GOOGLE_API_KEY=your_gemini_api_key
+# or OPENAI_API_KEY=your_openai_api_key
 
-# or OpenAI
-OPENAI_API_KEY=your_openai_api_key
-```
-
-### 3. Run the Web Application
-
-```bash
-# Start FastAPI application with Uvicorn
-python main.py
-# or
+# 4. Start the server
 uvicorn main:app --host 127.0.0.1 --port 8000 --reload
 ```
 
 Open your browser at **[http://127.0.0.1:8000](http://127.0.0.1:8000)**.
-
-### 4. Run via CLI (Optional)
-
-```bash
-# Generate a lesson directly from command line
-python education_system.py "How Docker Containers Work"
-```
 
 ---
 
 ## 📁 Project Structure
 
 ```
-├── education_system.py      # Core LangGraph 4-agent workflow & PDF compiler
-├── main.py                  # FastAPI server & REST API endpoints
+├── agent_memory.py          # Shared Persistent Memory Engine & feedback learning
+├── education_system.py      # LangGraph 4-agent workflow with memory injection & PDF engine
+├── main.py                  # FastAPI server & REST API endpoints (generation, memory, files)
 ├── templates/
-│   └── index.html           # Single-page Chat & PDF Studio web UI
+│   └── index.html           # Single-page Chat, PDF Studio, & Memory Inspector UI
+├── memory/
+│   └── agent_memory.json    # Persistent JSON storage for shared agent memory
 ├── Output/                  # Destination directory for generated PDF documents
 ├── requirements.txt         # Project dependencies
 ├── .env                     # Environment variables & API keys

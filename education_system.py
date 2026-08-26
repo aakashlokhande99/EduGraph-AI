@@ -23,6 +23,9 @@ from pydantic import BaseModel, Field
 import markdown
 from xhtml2pdf import pisa
 
+# Shared Persistent Memory Engine
+from agent_memory import get_shared_memory, SharedPersistentMemory
+
 # Ensure standard output and error support UTF-8 (emojis / unicode) on Windows
 if sys.platform == "win32":
     if hasattr(sys.stdout, "buffer"):
@@ -51,6 +54,7 @@ class EducationGraphState(TypedDict):
     is_satisfactory: bool
     revision_count: int
     final_content: Optional[str]
+    memory_context: Optional[dict]
 
 
 # ==========================================
@@ -155,23 +159,26 @@ def get_llm() -> BaseChatModel:
 def agent_1_concept_planner(state: EducationGraphState) -> dict:
     """
     Agent #1: Generates a list of concepts and sub-concepts for the topic,
-    assuming the learner has zero prior knowledge.
+    assuming the learner has zero prior knowledge. Injects shared persistent memory guidelines.
     """
     topic = state["topic"]
     print(f"\n[Agent #1 - Concept Planner] 🧠 Analyzing topic: '{topic}' for zero-knowledge learner...")
 
     llm = get_llm()
+    memory = get_shared_memory()
+    memory_context = memory.get_memory_context_for_agent("concept_planner", topic=topic)
 
     system_prompt = (
         "You are an expert curriculum designer and educator. Your specialty is breaking down complex "
         "subjects for absolute beginners with ZERO prior knowledge.\n"
         "Your task is to deconstruct the given topic into a structured list of foundational concepts "
-        "and sub-concepts arranged in a progressive, step-by-step learning sequence.\n"
-        "Rules:\n"
+        "and sub-concepts arranged in a progressive, step-by-step learning sequence.\n\n"
+        "Core Pedagogical Rules:\n"
         "1. Start with the most fundamental 'Why does this exist?' concept.\n"
         "2. Break each main concept into 4-10 granular sub-concepts.\n"
         "3. Avoid unintroduced jargon in the concept titles.\n"
-        "4. Format your output as a clear hierarchical numbered and bulleted list."
+        "4. Format your output as a clear hierarchical numbered and bulleted list.\n\n"
+        f"{memory_context}"
     )
 
     user_prompt = f"Topic to deconstruct: {topic}"
@@ -198,6 +205,7 @@ def agent_2_content_generator(state: EducationGraphState) -> dict:
     """
     Agent #2: Generates comprehensive educational content with real-world examples.
     If critique notes exist from Agent #3, incorporates feedback to improve the content.
+    Injects shared persistent memory guidelines and past feedback.
     """
     topic = state["topic"]
     concepts = state.get("concepts", [])
@@ -207,11 +215,13 @@ def agent_2_content_generator(state: EducationGraphState) -> dict:
     is_revision = bool(critique_notes and revision_count > 0)
 
     if is_revision:
-        print(f"\n[Agent #2 - Content Generator] ✍️  Revising content (Iteration #{revision_count}) incorporating critique...")
+        print(f"\n[Agent #2 - Content Generator] ✍️  Revising content (Iteration #{revision_count}) incorporating critique & persistent memory...")
     else:
-        print(f"\n[Agent #2 - Content Generator] ✍️  Drafting initial educational content with examples...")
+        print(f"\n[Agent #2 - Content Generator] ✍️  Drafting initial educational content with examples & persistent memory...")
 
     llm = get_llm()
+    memory = get_shared_memory()
+    memory_context = memory.get_memory_context_for_agent("content_generator", topic=topic)
 
     system_prompt = (
         "You are a master teacher and pedagogical writer. Your mission is to teach absolute beginners "
@@ -221,7 +231,8 @@ def agent_2_content_generator(state: EducationGraphState) -> dict:
         "- Provide concrete, step-by-step examples for every sub-concept.\n"
         "- When any technical term is introduced, define it immediately in plain English first.\n"
         "- Build intuition before diving into technical details.\n"
-        "- Maintain an encouraging, interactive, and clear tone."
+        "- Maintain an encouraging, interactive, and clear tone.\n\n"
+        f"{memory_context}"
     )
 
     concepts_str = "\n".join(concepts)
@@ -254,6 +265,7 @@ def agent_3_evaluator(state: EducationGraphState) -> dict:
     """
     Agent #3: Evaluates generated educational content against zero-knowledge beginner criteria.
     Decides if the content is satisfactory (proceed to Agent #4) or needs revisions (loop back to Agent #2).
+    Absorbs critiques directly into shared persistent memory for learning over time.
     """
     topic = state["topic"]
     content = state["content"]
@@ -262,6 +274,8 @@ def agent_3_evaluator(state: EducationGraphState) -> dict:
     print(f"\n[Agent #3 - Pedagogical Evaluator] 🔍 Evaluating draft clarity & beginner accessibility (Review #{current_revisions})...")
 
     llm = get_llm()
+    memory = get_shared_memory()
+    memory_context = memory.get_memory_context_for_agent("evaluator", topic=topic)
 
     # Use structured output for evaluation
     structured_llm = llm.with_structured_output(EvaluationResult)
@@ -277,7 +291,8 @@ def agent_3_evaluator(state: EducationGraphState) -> dict:
         "Decision Guidelines:\n"
         "- Set `is_satisfactory` to True ONLY if the content meets all 4 criteria with high pedagogical quality.\n"
         "- If `is_satisfactory` is False, provide detailed, constructive `critique_notes` indicating exact sections "
-        "that need simpler analogies, clearer definitions, or better beginner examples."
+        "that need simpler analogies, clearer definitions, or better beginner examples.\n\n"
+        f"{memory_context}"
     )
 
     evaluator_user_prompt = (
@@ -300,6 +315,16 @@ def agent_3_evaluator(state: EducationGraphState) -> dict:
         print(f"[Agent #3 - Pedagogical Evaluator] 🌟 SATISFACTORY! Content passed beginner-readiness check.")
     else:
         print(f"[Agent #3 - Pedagogical Evaluator] ⚠️  REVISION REQUIRED: {result.critique_notes[:120]}...")
+        # Record critique learning into shared persistent memory so all agents learn from this feedback
+        try:
+            memory.record_critique_learning(
+                topic=topic,
+                critique_notes=result.critique_notes,
+                revision_count=current_revisions,
+                target_agent="content_generator"
+            )
+        except Exception as err:
+            print(f"⚠️ Failed to record critique to memory: {err}")
 
     return {
         "is_satisfactory": result.is_satisfactory,
@@ -312,6 +337,7 @@ def agent_4_visual_language_enhancer(state: EducationGraphState) -> dict:
     """
     Agent #4: Takes the approved content and enhances it visually and linguistically.
     Adds markdown formatting, diagrams (ASCII/Mermaid), callouts, and simplifies wording.
+    Injects shared persistent memory guidelines on high-impact visual patterns.
     """
     topic = state["topic"]
     content = state["content"]
@@ -319,6 +345,8 @@ def agent_4_visual_language_enhancer(state: EducationGraphState) -> dict:
     print(f"\n[Agent #4 - Visual & Language Enhancer] ✨ Polishing visual formatting, diagrams, and simplified wording...")
 
     llm = get_llm()
+    memory = get_shared_memory()
+    memory_context = memory.get_memory_context_for_agent("visual_language_enhancer", topic=topic)
 
     system_prompt = (
         "You are an expert educational content designer and visual communicator. "
@@ -328,7 +356,8 @@ def agent_4_visual_language_enhancer(state: EducationGraphState) -> dict:
         "2. Callout Boxes: Add stylized callout quotes (e.g. `> 💡 **Core Intuition**`, `> 🎯 **Real-World Example**`, `> ⚠️ **Common Beginner Pitfall**`).\n"
         "3. Visual Diagrams: Include at least 1-2 clean Mermaid diagrams (` ```mermaid ... ``` `) or ASCII flowcharts illustrating the mental models.\n"
         "4. Language Polish: Ensure every sentence is engaging, conversational, highly intuitive, and easy to digest.\n"
-        "5. Summary / Quick Takeaways section at the end."
+        "5. Summary / Quick Takeaways section at the end.\n\n"
+        f"{memory_context}"
     )
 
     user_prompt = (
@@ -752,6 +781,17 @@ def generate_educational_content(
     except Exception as e:
         print(f"⚠️  PDF generation error: {e}")
 
+    # Record successful completion to Shared Persistent Memory
+    memory = get_shared_memory()
+    try:
+        memory.record_success_learning(
+            topic=topic_clean,
+            concepts=result.get("concepts", []),
+            revision_count=result.get("revision_count", 0)
+        )
+    except Exception as mem_err:
+        print(f"⚠️  Memory recording warning: {mem_err}")
+
     return {
         "topic": topic_clean,
         "final_content": final_content,
@@ -761,7 +801,8 @@ def generate_educational_content(
         "pdf_filename": os.path.basename(pdf_path) if pdf_path else None,
         "pdf_path": pdf_path,
         "concepts": result.get("concepts", []),
-        "is_satisfactory": result.get("is_satisfactory", True)
+        "is_satisfactory": result.get("is_satisfactory", True),
+        "memory_stats": memory.get_memory_stats()
     }
 
 

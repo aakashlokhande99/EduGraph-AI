@@ -13,6 +13,7 @@ from fastapi.responses import HTMLResponse, FileResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
+from agent_memory import get_shared_memory
 
 # Import the modular education system
 import education_system
@@ -20,8 +21,8 @@ import education_system
 # Initialize FastAPI app
 app = FastAPI(
     title="Zero-Knowledge Educational AI Studio",
-    description="Multi-agent educational content generation pipeline with interactive PDF viewer",
-    version="1.0.0"
+    description="Multi-agent educational content generation pipeline with interactive PDF viewer and shared persistent memory",
+    version="1.1.0"
 )
 
 # Enable CORS for development flexibility
@@ -45,6 +46,12 @@ class GenerateRequest(BaseModel):
     recursion_limit: Optional[int] = Field(default=15, ge=5, le=30, description="Maximum graph recursion limit.")
 
 
+class FeedbackRequest(BaseModel):
+    topic: str = Field(..., min_length=1, max_length=300, description="The topic being reviewed.")
+    rating: int = Field(..., ge=1, le=5, description="Student/user rating from 1 to 5 stars.")
+    comment: Optional[str] = Field(default="", max_length=1000, description="Constructive feedback, praise, or critique.")
+
+
 class GenerateResponse(BaseModel):
     topic: str
     final_content: str
@@ -55,6 +62,7 @@ class GenerateResponse(BaseModel):
     markdown_url: Optional[str]
     concepts: list[str] = []
     is_satisfactory: bool = True
+    memory_stats: Optional[dict] = None
 
 
 # ==========================================
@@ -118,10 +126,70 @@ async def generate_lesson(req: GenerateRequest):
             pdf_url=f"/api/pdf/{pdf_filename}" if pdf_filename else None,
             markdown_url=f"/api/markdown/{md_filename}" if md_filename else None,
             concepts=result.get("concepts", []),
-            is_satisfactory=result.get("is_satisfactory", True)
+            is_satisfactory=result.get("is_satisfactory", True),
+            memory_stats=result.get("memory_stats")
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Generation failed: {str(e)}")
+
+
+# ==========================================
+# Shared Persistent Memory Endpoints
+# ==========================================
+@app.get("/api/memory")
+async def get_memory_data():
+    """
+    Returns persistent memory statistics, agent-specific guidelines,
+    critique learnings, and user feedback history.
+    """
+    try:
+        memory = get_shared_memory()
+        return {
+            "stats": memory.get_memory_stats(),
+            "full_memory": memory.get_full_memory()
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to fetch persistent memory: {str(e)}")
+
+
+@app.post("/api/memory/feedback")
+async def submit_feedback(req: FeedbackRequest):
+    """
+    Ingests user ratings and feedback comments to teach and refine the agents'
+    persistent memory guidelines over time.
+    """
+    try:
+        memory = get_shared_memory()
+        entry = memory.record_user_feedback(
+            topic=req.topic,
+            rating=req.rating,
+            comment=req.comment or ""
+        )
+        return {
+            "status": "success",
+            "message": f"Feedback for '{req.topic}' successfully absorbed into persistent memory!",
+            "entry": entry,
+            "stats": memory.get_memory_stats()
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to submit feedback: {str(e)}")
+
+
+@app.post("/api/memory/reset")
+async def reset_memory():
+    """
+    Resets the persistent memory back to initial default zero-knowledge seed rules.
+    """
+    try:
+        memory = get_shared_memory()
+        fresh = memory.reset_memory()
+        return {
+            "status": "success",
+            "message": "Persistent memory reset to baseline defaults.",
+            "stats": memory.get_memory_stats()
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to reset memory: {str(e)}")
 
 
 @app.get("/api/pdf/{filename}")

@@ -1,0 +1,149 @@
+{
+  "version": "1.0.0",
+  "last_updated": "2026-08-26T08:28:54.432883",
+  "statistics": {
+    "total_lessons_generated": 1,
+    "total_critiques_absorbed": 2,
+    "total_revisions_performed": 2,
+    "total_user_feedbacks": 4,
+    "average_user_rating": 5.0
+  },
+  "global_principles": [
+    "Zero-Assumption Rule: Never assume the reader knows mathematical shorthand, acronyms, or industry jargon.",
+    "Physical Grounding First: Always introduce a tangible, physical world metaphor before presenting any technical abstraction.",
+    "Cognitive Staircase: Never introduce concept B until prerequisite concept A has been fully anchored with an example.",
+    "Contrastive Learning: When introducing a new mechanism, contrast it with what life was like *before* it existed or against its opposite.",
+    "Encouraging Tone: Keep tone warm, curious, and empowering to minimize beginner intimidation."
+  ],
+  "agent_memories": {
+    "concept_planner": {
+      "role_focus": "Curriculum architecture and zero-knowledge concept decomposition",
+      "guidelines": [
+        "Always start Concept #1 with 'The Intuitive Problem: Why was this invented?' rather than technical definitions.",
+        "Structure roadmap into 4-6 distinct, progressive milestones without circular dependencies.",
+        "Explicitly list prerequisite vocabulary in sub-concepts before compound mechanisms.",
+        "Keep concept titles descriptive and conversational rather than academic (e.g. 'The Postal Delivery Route' instead of 'Packet Routing Protocols')."
+      ],
+      "effective_patterns": [
+        "Progression Model: 1. Everyday Analogy -> 2. The Core Problem -> 3. The Big Idea -> 4. Step-by-Step Mechanics -> 5. Real-World Applications.",
+        "Granular milestone breakdown with self-contained digestible sub-topics."
+      ],
+      "pitfalls_to_avoid": [
+        "Do not group multiple distinct mechanisms under a single vague concept heading.",
+        "Avoid skipping foundational definitions to reach advanced features quickly."
+      ]
+    },
+    "content_generator": {
+      "role_focus": "Pedagogical explanation drafting and relatable analogy creation",
+      "guidelines": [
+        "Begin every section with a vivid, relatable everyday scenario (e.g. baking, traffic, library, sports).",
+        "Define every technical term immediately in parentheses in plain English upon first mention.",
+        "Walk through concrete numerical or narrative step-by-step examples rather than abstract equations.",
+        "Explicitly highlight 'What this means in practice' after introducing any new concept."
+      ],
+      "effective_patterns": [
+        "Analogy Template: 'Imagine you are running a restaurant kitchen...' -> Map kitchen roles directly to system components.",
+        "Before/After Framing: 'Without this mechanism: [Chaotic scenario]. With this mechanism: [Smooth scenario].'",
+        "Step-by-Step Walkthrough: 'Step 1: Input arrives... Step 2: Inspection occurs... Step 3: Result is delivered.'",
+        "Student Praise on 'Neural Networks': The recipe analogy was super clear!",
+        "Student Praise on 'Binary Search': The phonebook tearing analogy was awesome!",
+        "Student Praise on 'Microservices Architecture': The food truck vs restaurant chain analogy was brilliant!"
+      ],
+      "pitfalls_to_avoid": [
+        "Never use phrases like 'obviously', 'simply', 'as everyone knows', or 'it is trivial'.",
+        "Do not use secondary domain jargon inside an analogy (e.g., explaining computers using car transmission mechanics if cars are also complex).",
+        "Lesson from 'Quantum Computing': Section 2 introduces the term 'Wavefunction Collapse' without explaining it using a tangible analogy",
+        "Lesson from 'Test Topic': Some note"
+      ]
+    },
+    "evaluator": {
+      "role_focus": "Pedagogical audit against zero-knowledge beginner criteria",
+      "guidelines": [
+        "Audit rigorously for 'Curse of Knowledge': Flag any term used before it was explicitly defined.",
+        "Verify that every abstract statement has an accompanying concrete example.",
+        "Check that the transition between sections contains smooth connective tissue, not abrupt leaps.",
+        "Require concrete remediation instructions in critique notes rather than generic complaints."
+      ],
+      "effective_patterns": [
+        "Constructive Critique Format: Point to specific section -> Explain why a beginner would be confused -> Suggest a concrete analogy to fix it.",
+        "Zero-Jargon Scanner: Verify every acronym (e.g., API, CPU, HTTP, AI, LLM) has its intuition unpacked."
+      ],
+      "pitfalls_to_avoid": [
+        "Do not mark content satisfactory if it includes raw mathematical equations without visual/verbal intuition.",
+        "Avoid vague critique notes like 'Make it simpler'—always provide actionable suggestions."
+      ]
+    },
+    "visual_language_enhancer": {
+      "role_focus": "Visual structure, callout styling, diagrams, and language polish",
+      "guidelines": [
+        "Include at least one clean, clear Mermaid diagram or ASCII workflow illustrating the mental model.",
+        "Use styled blockquotes for distinct pedagogical categories: `> 💡 **Core Intuition**`, `> 🎯 **Real-World Example**`, `> ⚠️ **Common Beginner Trap**`, `> 🔍 **Deep Dive**`.",
+        "Break up long text blocks using Markdown tables for side-by-side comparisons.",
+        "End the guide with a '⚡ Key Takeaways' summary table and a '🧭 Next Steps' learning bridge."
+      ],
+      "effective_patterns": [
+        "Visual Mermaid Flowchart: `graph TD; Input[User Question] --> Brain[AI Model] --> Output[Answer]`",
+        "Comparison Tables: Column 1: Feature | Column 2: Without It | Column 3: With It."
+      ],
+      "pitfalls_to_avoid": [
+        "Avoid overly complex Mermaid syntax that fails to render cleanly in standard Markdown engines.",
+        "Do not create walls of plain text without visual breaks every 2-3 paragraphs."
+      ]
+    }
+  },
+  "critique_learnings": [
+    {
+      "id": "critique_1787713101_1",
+      "timestamp": "2026-08-26T08:28:21.173706",
+      "topic": "Quantum Computing",
+      "revision_count": 1,
+      "target_agent": "content_generator",
+      "raw_critique": "Section 2 introduces the term 'Wavefunction Collapse' without explaining it using a tangible analogy. A beginner with zero knowledge will be completely confused.",
+      "distilled_lesson": "Section 2 introduces the term 'Wavefunction Collapse' without explaining it using a tangible analogy"
+    },
+    {
+      "id": "critique_1787713101_1",
+      "timestamp": "2026-08-26T08:28:21.231168",
+      "topic": "Test Topic",
+      "revision_count": 1,
+      "target_agent": "content_generator",
+      "raw_critique": "Some note",
+      "distilled_lesson": "Some note"
+    }
+  ],
+  "user_feedback_history": [
+    {
+      "id": "fb_1787713101",
+      "timestamp": "2026-08-26T08:28:21.163469",
+      "topic": "Neural Networks",
+      "rating": 5,
+      "comment": "The recipe analogy was super clear!"
+    },
+    {
+      "id": "fb_1787713101",
+      "timestamp": "2026-08-26T08:28:21.212154",
+      "topic": "Binary Search",
+      "rating": 5,
+      "comment": "The phonebook tearing analogy was awesome!"
+    },
+    {
+      "id": "fb_1787713121",
+      "timestamp": "2026-08-26T08:28:41.756888",
+      "topic": "Neural Networks",
+      "rating": 5,
+      "comment": "The recipe analogy was super clear!"
+    },
+    {
+      "id": "fb_1787713134",
+      "timestamp": "2026-08-26T08:28:54.432872",
+      "topic": "Microservices Architecture",
+      "rating": 5,
+      "comment": "The food truck vs restaurant chain analogy was brilliant!"
+    }
+  ],
+  "topic_learnings": {
+    "binary_search": [
+      "Proven progression roadmap: Why Search Matters -> The Phonebook Idea -> Step-by-step Halving"
+    ]
+  }
+}

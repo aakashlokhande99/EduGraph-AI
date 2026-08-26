@@ -911,8 +911,308 @@
             opacity: 1;
         }
 
+        /* Memory Modal & Feedback Styles */
+        .btn-memory {
+            background: linear-gradient(135deg, rgba(56, 189, 248, 0.15), rgba(168, 85, 247, 0.15));
+            border: 1px solid rgba(168, 85, 247, 0.35);
+            color: #e0e7ff;
+        }
+
+        .btn-memory:hover {
+            border-color: var(--accent-purple);
+            background: linear-gradient(135deg, rgba(56, 189, 248, 0.25), rgba(168, 85, 247, 0.25));
+            box-shadow: 0 0 15px rgba(168, 85, 247, 0.25);
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(10, 15, 29, 0.85);
+            backdrop-filter: blur(12px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 3000;
+            padding: 1.5rem;
+            animation: fadeIn 0.2s ease;
+        }
+
+        .modal-overlay.open {
+            display: flex;
+        }
+
+        .memory-modal {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-highlight);
+            border-radius: var(--radius-xl);
+            box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.8), var(--shadow-glow);
+            width: 100%;
+            max-width: 900px;
+            max-height: 88vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            animation: scaleUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes scaleUp {
+            from { transform: scale(0.95); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .modal-header {
+            padding: 1.25rem 1.75rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--bg-tertiary);
+        }
+
+        .modal-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.15rem;
+            font-weight: 700;
+            background: var(--gradient-brand);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .modal-body {
+            padding: 1.75rem;
+            overflow-y: auto;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.85rem;
+        }
+
+        .stat-card {
+            background: var(--bg-glass-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 1rem;
+            text-align: center;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+
+        .stat-card:hover {
+            border-color: var(--accent-cyan);
+            transform: translateY(-2px);
+        }
+
+        .stat-val {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--accent-cyan);
+            margin-bottom: 0.2rem;
+        }
+
+        .stat-lbl {
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .modal-tabs {
+            display: flex;
+            gap: 0.5rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .modal-tab-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            font-weight: 600;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .modal-tab-btn:hover {
+            color: var(--text-main);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .modal-tab-btn.active {
+            color: var(--accent-cyan);
+            background: rgba(56, 189, 248, 0.12);
+            border: 1px solid rgba(56, 189, 248, 0.25);
+        }
+
+        .tab-pane {
+            display: none;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        .tab-pane.active {
+            display: flex;
+        }
+
+        .agent-memory-card {
+            background: rgba(10, 15, 29, 0.55);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .agent-card-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            padding-bottom: 0.5rem;
+        }
+
+        .agent-badge-title {
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: var(--accent-cyan);
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .agent-role-desc {
+            font-size: 0.78rem;
+            color: var(--text-dim);
+            font-style: italic;
+        }
+
+        .memory-bullet-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.45rem;
+            font-size: 0.84rem;
+            color: #cbd5e1;
+        }
+
+        .memory-bullet-list li {
+            position: relative;
+            padding-left: 1.4rem;
+            line-height: 1.5;
+        }
+
+        .memory-bullet-list li::before {
+            content: "•";
+            position: absolute;
+            left: 0.4rem;
+            color: var(--accent-cyan);
+            font-weight: bold;
+        }
+
+        .critique-log-item {
+            background: rgba(15, 23, 42, 0.6);
+            border-left: 3px solid var(--accent-amber);
+            border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+            padding: 0.75rem 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+            font-size: 0.82rem;
+        }
+
+        .critique-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            color: var(--text-dim);
+            font-size: 0.72rem;
+        }
+
+        /* Student Feedback Widget inside AI Card */
+        .feedback-box {
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            border-radius: var(--radius-md);
+            padding: 1rem 1.25rem;
+            margin-top: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .feedback-box-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--accent-indigo);
+        }
+
+        .star-rating {
+            display: flex;
+            gap: 0.35rem;
+            cursor: pointer;
+            font-size: 1.2rem;
+            user-select: none;
+        }
+
+        .star-rating span {
+            color: #475569;
+            transition: color 0.15s, transform 0.15s;
+        }
+
+        .star-rating span:hover,
+        .star-rating span.selected {
+            color: #fbbf24;
+            transform: scale(1.15);
+        }
+
+        .feedback-input {
+            width: 100%;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            padding: 0.5rem 0.75rem;
+            color: var(--text-main);
+            font-size: 0.82rem;
+            outline: none;
+            resize: none;
+            transition: border-color 0.2s;
+        }
+
+        .feedback-input:focus {
+            border-color: var(--accent-cyan);
+        }
+
+        .feedback-actions {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 0.5rem;
+        }
+
         /* Responsive Breakpoints */
         @media (max-width: 1024px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
             .pdf-viewer-panel.open {
                 width: 100%;
                 position: absolute;
@@ -950,10 +1250,9 @@
         </div>
 
         <div class="header-actions">
-            <div class="badge-agent">
-                <span class="pulse-dot"></span>
-                <span>LangGraph 4-Agent Pipeline</span>
-            </div>
+            <button class="btn-header btn-memory" id="btnOpenMemory" title="Inspect Shared Agent Memory & Continuous Learning">
+                🧠 <span>Agent Memory (<span id="memoryInsightsCount">--</span>)</span>
+            </button>
             <button class="btn-header" id="btnToggleSidebar" title="Toggle Document Library">
                 📚 <span>Library (<span id="libraryCount">0</span>)</span>
             </button>
@@ -1105,6 +1404,136 @@
 
     </div>
 
+    <!-- Shared Persistent Memory Inspector Modal -->
+    <div class="modal-overlay" id="memoryModalOverlay">
+        <div class="memory-modal">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <span>🧠</span>
+                    <span>Shared Persistent Agent Memory & Feedback Learning</span>
+                </div>
+                <button class="btn-icon" id="btnCloseMemoryModal" title="Close">✕</button>
+            </div>
+
+            <div class="modal-body">
+                <!-- Learning Statistics Grid -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-val" id="statLessons">0</div>
+                        <div class="stat-lbl">Lessons Generated</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-val" id="statCritiques" style="color: var(--accent-amber);">0</div>
+                        <div class="stat-lbl">Critiques Absorbed</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-val" id="statGuidelines" style="color: var(--accent-emerald);">0</div>
+                        <div class="stat-lbl">Active Guidelines</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-val" id="statRating" style="color: var(--accent-purple);">5.0★</div>
+                        <div class="stat-lbl">Avg Student Rating</div>
+                    </div>
+                </div>
+
+                <!-- Navigation Tabs -->
+                <div class="modal-tabs">
+                    <button class="modal-tab-btn active" onclick="switchMemoryTab('overview')">🌐 Global Principles</button>
+                    <button class="modal-tab-btn" onclick="switchMemoryTab('agents')">🤖 Agent-Specific Memory</button>
+                    <button class="modal-tab-btn" onclick="switchMemoryTab('history')">📜 Critique & Feedback Log</button>
+                </div>
+
+                <!-- Tab 1: Global Overview -->
+                <div class="tab-pane active" id="tabOverview">
+                    <div class="agent-memory-card">
+                        <div class="agent-badge-title">
+                            <span>🏛️ Core Pedagogical Principles (All Agents)</span>
+                        </div>
+                        <ul class="memory-bullet-list" id="globalPrinciplesList">
+                            <!-- Populated dynamically -->
+                        </ul>
+                    </div>
+
+                    <div class="agent-memory-card">
+                        <div class="agent-badge-title">
+                            <span>📚 Topics Mastered & Domain Roadmaps</span>
+                        </div>
+                        <div id="topicsMasteredList" style="display: flex; flex-direction: column; gap: 0.5rem;">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab 2: Agent Specific Memory -->
+                <div class="tab-pane" id="tabAgents">
+                    <div class="agent-memory-card">
+                        <div class="agent-card-top">
+                            <div class="agent-badge-title">🧠 Agent #1: Concept Planner</div>
+                            <span class="agent-role-desc">Curriculum architecture</span>
+                        </div>
+                        <div style="font-size: 0.78rem; font-weight: 600; color: var(--accent-cyan);">Learned Guidelines:</div>
+                        <ul class="memory-bullet-list" id="agent1Guidelines"></ul>
+                        <div style="font-size: 0.78rem; font-weight: 600; color: var(--accent-rose); margin-top: 0.4rem;">Pitfalls Avoided:</div>
+                        <ul class="memory-bullet-list" id="agent1Pitfalls"></ul>
+                    </div>
+
+                    <div class="agent-memory-card">
+                        <div class="agent-card-top">
+                            <div class="agent-badge-title">✍️ Agent #2: Content Generator</div>
+                            <span class="agent-role-desc">Explanations & relatable analogies</span>
+                        </div>
+                        <div style="font-size: 0.78rem; font-weight: 600; color: var(--accent-cyan);">Learned Guidelines & Analogies:</div>
+                        <ul class="memory-bullet-list" id="agent2Guidelines"></ul>
+                        <div style="font-size: 0.78rem; font-weight: 600; color: var(--accent-rose); margin-top: 0.4rem;">Pitfalls Avoided:</div>
+                        <ul class="memory-bullet-list" id="agent2Pitfalls"></ul>
+                    </div>
+
+                    <div class="agent-memory-card">
+                        <div class="agent-card-top">
+                            <div class="agent-badge-title">🔍 Agent #3: Pedagogical Evaluator</div>
+                            <span class="agent-role-desc">Strict zero-knowledge audit</span>
+                        </div>
+                        <div style="font-size: 0.78rem; font-weight: 600; color: var(--accent-cyan);">Audit Standards:</div>
+                        <ul class="memory-bullet-list" id="agent3Guidelines"></ul>
+                    </div>
+
+                    <div class="agent-memory-card">
+                        <div class="agent-card-top">
+                            <div class="agent-badge-title">✨ Agent #4: Visual & Language Enhancer</div>
+                            <span class="agent-role-desc">Mermaid diagrams & Markdown polish</span>
+                        </div>
+                        <div style="font-size: 0.78rem; font-weight: 600; color: var(--accent-cyan);">Visual Patterns & Formatting Rules:</div>
+                        <ul class="memory-bullet-list" id="agent4Guidelines"></ul>
+                    </div>
+                </div>
+
+                <!-- Tab 3: History & Feedback Log -->
+                <div class="tab-pane" id="tabHistory">
+                    <div style="font-size: 0.88rem; font-weight: 700; color: var(--accent-amber);">
+                        🔍 Evaluator Critiques Absorbed (Prevented in Future):
+                    </div>
+                    <div id="critiquesLogContainer" style="display: flex; flex-direction: column; gap: 0.6rem;">
+                        <!-- Populated dynamically -->
+                    </div>
+
+                    <div style="font-size: 0.88rem; font-weight: 700; color: var(--accent-indigo); margin-top: 1rem;">
+                        🎓 Student & User Feedback Log:
+                    </div>
+                    <div id="userFeedbackContainer" style="display: flex; flex-direction: column; gap: 0.6rem;">
+                        <!-- Populated dynamically -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-header" style="background: rgba(10, 15, 29, 0.95); justify-content: space-between; border-top: 1px solid var(--border-color); border-bottom: none;">
+                <span style="font-size: 0.76rem; color: var(--text-dim);">Changes persist automatically to <code>memory/agent_memory.json</code></span>
+                <button class="btn-action btn-action-secondary" style="color: var(--accent-rose); border-color: rgba(244, 63, 94, 0.3);" onclick="resetMemoryToDefaults()">
+                    🔄 Reset to Baseline
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Toast Notification -->
     <div class="toast" id="toast">
         <span id="toastIcon">✅</span>
@@ -1118,6 +1547,8 @@
         let isGenerating = false;
         let timerInterval = null;
         let elapsedSeconds = 0;
+        let memoryCache = null;
+        const lessonRatings = {};
 
         // Configure Marked.js with highlight.js
         marked.setOptions({
@@ -1133,6 +1564,7 @@
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', () => {
             fetchDocuments();
+            fetchMemoryStats();
             setupEventListeners();
             autoResizeTextarea();
         });
@@ -1158,6 +1590,13 @@
             });
 
             document.getElementById('btnRefreshDocs').addEventListener('click', fetchDocuments);
+
+            // Memory Modal open / close
+            document.getElementById('btnOpenMemory').addEventListener('click', openMemoryModal);
+            document.getElementById('btnCloseMemoryModal').addEventListener('click', closeMemoryModal);
+            document.getElementById('memoryModalOverlay').addEventListener('click', (e) => {
+                if (e.target.id === 'memoryModalOverlay') closeMemoryModal();
+            });
 
             // Document search filter
             document.getElementById('searchInput').addEventListener('input', (e) => {
@@ -1201,7 +1640,242 @@
             input.style.height = input.scrollHeight + 'px';
         }
 
-        // Fetch document library
+        // ==========================================
+        // Shared Persistent Memory Functions
+        // ==========================================
+        async function fetchMemoryStats() {
+            try {
+                const res = await fetch('/api/memory');
+                if (!res.ok) return;
+                const data = await res.json();
+                memoryCache = data;
+                const totalCount = (data.stats.counts.total_guidelines || 0) + (data.stats.counts.total_pitfalls_tracked || 0);
+                document.getElementById('memoryInsightsCount').textContent = totalCount;
+            } catch (err) {
+                console.error('Failed to fetch memory stats:', err);
+            }
+        }
+
+        async function openMemoryModal() {
+            document.getElementById('memoryModalOverlay').classList.add('open');
+            await loadMemoryModalData();
+        }
+
+        function closeMemoryModal() {
+            document.getElementById('memoryModalOverlay').classList.remove('open');
+        }
+
+        async function loadMemoryModalData() {
+            try {
+                const res = await fetch('/api/memory');
+                if (!res.ok) throw new Error('Failed to fetch memory');
+                const data = await res.json();
+                memoryCache = data;
+
+                const mem = data.full_memory || {};
+                const stats = mem.statistics || {};
+                const counts = data.stats.counts || {};
+
+                // Populate Stats Cards
+                document.getElementById('statLessons').textContent = stats.total_lessons_generated || 0;
+                document.getElementById('statCritiques').textContent = stats.total_critiques_absorbed || 0;
+                document.getElementById('statGuidelines').textContent = (counts.total_guidelines || 0) + (counts.total_pitfalls_tracked || 0);
+                document.getElementById('statRating').textContent = `${stats.average_user_rating || 5.0}★`;
+                document.getElementById('memoryInsightsCount').textContent = (counts.total_guidelines || 0) + (counts.total_pitfalls_tracked || 0);
+
+                // Global Principles
+                const principlesList = document.getElementById('globalPrinciplesList');
+                principlesList.innerHTML = '';
+                (mem.global_principles || []).forEach(p => {
+                    const li = document.createElement('li');
+                    li.textContent = p;
+                    principlesList.appendChild(li);
+                });
+
+                // Topics Mastered
+                const topicsList = document.getElementById('topicsMasteredList');
+                topicsList.innerHTML = '';
+                const topicEntries = Object.entries(mem.topic_learnings || {});
+                if (topicEntries.length === 0) {
+                    topicsList.innerHTML = '<div style="color: var(--text-dim); font-size: 0.8rem;">No topic lessons generated yet. Try generating your first topic!</div>';
+                } else {
+                    topicEntries.forEach(([tKey, insights]) => {
+                        const div = document.createElement('div');
+                        div.style.cssText = 'background: rgba(30, 41, 69, 0.4); padding: 0.6rem 0.85rem; border-radius: var(--radius-sm); font-size: 0.82rem;';
+                        div.innerHTML = `<strong style="color: var(--accent-cyan); text-transform: capitalize;">${tKey.replace(/_/g, ' ')}:</strong> <span style="color: var(--text-muted);">${insights.join('; ')}</span>`;
+                        topicsList.appendChild(div);
+                    });
+                }
+
+                // Agent Memories
+                const agentMems = mem.agent_memories || {};
+
+                // Agent 1
+                populateList('agent1Guidelines', agentMems.concept_planner?.guidelines);
+                populateList('agent1Pitfalls', agentMems.concept_planner?.pitfalls_to_avoid);
+
+                // Agent 2
+                populateList('agent2Guidelines', agentMems.content_generator?.guidelines);
+                populateList('agent2Pitfalls', agentMems.content_generator?.pitfalls_to_avoid);
+
+                // Agent 3
+                populateList('agent3Guidelines', agentMems.evaluator?.guidelines);
+
+                // Agent 4
+                populateList('agent4Guidelines', agentMems.visual_language_enhancer?.guidelines);
+
+                // Critiques Log
+                const critiqueContainer = document.getElementById('critiquesLogContainer');
+                critiqueContainer.innerHTML = '';
+                const critiques = mem.critique_learnings || [];
+                if (critiques.length === 0) {
+                    critiqueContainer.innerHTML = '<div style="color: var(--text-dim); font-size: 0.8rem;">No revision critiques recorded yet. All drafts passed or have clean memory.</div>';
+                } else {
+                    critiques.slice().reverse().forEach(c => {
+                        const div = document.createElement('div');
+                        div.className = 'critique-log-item';
+                        div.innerHTML = `
+                            <div class="critique-meta">
+                                <strong>Topic: ${escapeHtml(c.topic)}</strong>
+                                <span>${c.timestamp ? new Date(c.timestamp).toLocaleTimeString() : ''}</span>
+                            </div>
+                            <div style="color: #fde68a;"><strong>Lesson Learned:</strong> ${escapeHtml(c.distilled_lesson || '')}</div>
+                            <div style="color: var(--text-dim); font-size: 0.75rem;">${escapeHtml(c.raw_critique || '')}</div>
+                        `;
+                        critiqueContainer.appendChild(div);
+                    });
+                }
+
+                // Student Feedback Log
+                const fbContainer = document.getElementById('userFeedbackContainer');
+                fbContainer.innerHTML = '';
+                const feedbacks = mem.user_feedback_history || [];
+                if (feedbacks.length === 0) {
+                    fbContainer.innerHTML = '<div style="color: var(--text-dim); font-size: 0.8rem;">No student ratings submitted yet. Rate any generated lesson to train agents!</div>';
+                } else {
+                    feedbacks.slice().reverse().forEach(fb => {
+                        const div = document.createElement('div');
+                        div.className = 'critique-log-item';
+                        div.style.borderLeftColor = fb.rating >= 4 ? 'var(--accent-emerald)' : 'var(--accent-rose)';
+                        div.innerHTML = `
+                            <div class="critique-meta">
+                                <strong>Topic: ${escapeHtml(fb.topic)} (${'⭐'.repeat(fb.rating)})</strong>
+                                <span>${fb.timestamp ? new Date(fb.timestamp).toLocaleTimeString() : ''}</span>
+                            </div>
+                            <div style="color: #e2e8f0;">"${escapeHtml(fb.comment || 'No comment')}"</div>
+                        `;
+                        fbContainer.appendChild(div);
+                    });
+                }
+
+            } catch (err) {
+                console.error('Error loading memory modal:', err);
+                showToast('Failed to load memory data', '⚠️');
+            }
+        }
+
+        function populateList(elementId, items) {
+            const el = document.getElementById(elementId);
+            if (!el) return;
+            el.innerHTML = '';
+            (items || []).forEach(item => {
+                const li = document.createElement('li');
+                li.textContent = item;
+                el.appendChild(li);
+            });
+        }
+
+        function switchMemoryTab(tabName) {
+            const tabButtons = document.querySelectorAll('.modal-tab-btn');
+            tabButtons.forEach(btn => btn.classList.remove('active'));
+
+            const tabPanes = document.querySelectorAll('.tab-pane');
+            tabPanes.forEach(pane => pane.classList.remove('active'));
+
+            if (tabName === 'overview') {
+                tabButtons[0].classList.add('active');
+                document.getElementById('tabOverview').classList.add('active');
+            } else if (tabName === 'agents') {
+                tabButtons[1].classList.add('active');
+                document.getElementById('tabAgents').classList.add('active');
+            } else if (tabName === 'history') {
+                tabButtons[2].classList.add('active');
+                document.getElementById('tabHistory').classList.add('active');
+            }
+        }
+
+        async function resetMemoryToDefaults() {
+            if (!confirm('Are you sure you want to reset persistent memory back to initial baseline defaults?')) return;
+            try {
+                const res = await fetch('/api/memory/reset', { method: 'POST' });
+                if (!res.ok) throw new Error('Reset failed');
+                showToast('Memory reset to baseline seed rules', '🔄');
+                await loadMemoryModalData();
+            } catch (err) {
+                showToast(`Error resetting memory: ${err.message}`, '⚠️');
+            }
+        }
+
+        // ==========================================
+        // Student Rating & Feedback System
+        // ==========================================
+        function setStarRating(lessonId, rating) {
+            lessonRatings[lessonId] = rating;
+            const container = document.getElementById(`stars_${lessonId}`);
+            if (!container) return;
+            const stars = container.querySelectorAll('span');
+            stars.forEach((star, idx) => {
+                if (idx < rating) {
+                    star.classList.add('selected');
+                } else {
+                    star.classList.remove('selected');
+                }
+            });
+        }
+
+        async function submitStudentFeedback(topic, lessonId) {
+            const rating = lessonRatings[lessonId] || 5;
+            const commentInput = document.getElementById(`feedbackInput_${lessonId}`);
+            const comment = commentInput ? commentInput.value.trim() : '';
+
+            try {
+                const res = await fetch('/api/memory/feedback', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        topic: topic,
+                        rating: rating,
+                        comment: comment
+                    })
+                });
+
+                if (!res.ok) throw new Error('Feedback submission failed');
+
+                const data = await res.json();
+                showToast(`Absorbed into Agent Memory (${rating}★)!`, '🧠');
+
+                // Replace feedback box with thanks message
+                const box = document.getElementById(`feedbackBox_${lessonId}`);
+                if (box) {
+                    box.innerHTML = `
+                        <div style="color: var(--accent-emerald); font-size: 0.85rem; display: flex; align-items: center; gap: 0.5rem;">
+                            <span>✅</span>
+                            <span><strong>Thank you!</strong> Your feedback on "${escapeHtml(topic)}" has been added to the shared persistent memory. All agents will adapt accordingly on future topics.</span>
+                        </div>
+                    `;
+                }
+
+                // Refresh memory counter
+                await fetchMemoryStats();
+
+            } catch (err) {
+                showToast(`Error submitting feedback: ${err.message}`, '⚠️');
+            }
+        }
+
+        // ==========================================
+        // Document & Lesson Rendering
+        // ==========================================
         async function fetchDocuments() {
             try {
                 const res = await fetch('/api/documents');
@@ -1242,7 +1916,6 @@
                 card.addEventListener('click', () => {
                     openPdfInViewer(doc.pdf_url, doc.title);
                     highlightActiveCard(doc.pdf_filename);
-                    // Automatically collapse the left sidebar (generated lessons library)
                     document.getElementById('sidebar').classList.add('collapsed');
                 });
 
@@ -1253,10 +1926,8 @@
         function highlightActiveCard(filename) {
             const cards = document.querySelectorAll('.doc-card');
             cards.forEach(card => card.classList.remove('active'));
-            // re-render or class toggle
         }
 
-        // Open PDF in Split Panel
         function openPdfInViewer(url, title = 'Educational Guide') {
             activePdfUrl = url;
             const panel = document.getElementById('pdfPanel');
@@ -1274,21 +1945,16 @@
             showToast(`Loaded: ${title}`, '📄');
         }
 
-        // Trigger Generation
         async function handleGenerate(event) {
             event.preventDefault();
             const input = document.getElementById('topicInput');
             const topic = input.value.trim();
             if (!topic || isGenerating) return;
 
-            // Reset input
             input.value = '';
             input.style.height = 'auto';
 
-            // Add user message to UI
             appendUserMessage(topic);
-
-            // Start Generation Progress
             startGenerationProgress(topic);
 
             try {
@@ -1306,13 +1972,10 @@
                 const result = await response.json();
                 stopGenerationProgress();
 
-                // Append AI Response
                 appendAiMessage(result);
-
-                // Refresh Document library
                 await fetchDocuments();
+                await fetchMemoryStats();
 
-                // Open PDF in Viewer automatically
                 if (result.pdf_url) {
                     openPdfInViewer(result.pdf_url, result.topic);
                 }
@@ -1344,6 +2007,8 @@
             const list = document.getElementById('messagesList');
             const row = document.createElement('div');
             row.className = 'message-row';
+            const lessonId = 'lesson_' + Date.now();
+            lessonRatings[lessonId] = 5;
 
             const parsedHtml = marked.parse(data.final_content || '');
 
@@ -1381,6 +2046,32 @@
                                 📋 Copy Markdown
                             </button>
                         </div>
+
+                        <!-- Interactive Student Feedback Card (Trains Shared Agent Memory) -->
+                        <div class="feedback-box" id="feedbackBox_${lessonId}">
+                            <div class="feedback-box-header">
+                                <span>🎓 Teach the Agents (Feedback Learning)</span>
+                                <div class="star-rating" id="stars_${lessonId}">
+                                    <span class="selected" onclick="setStarRating('${lessonId}', 1)">★</span>
+                                    <span class="selected" onclick="setStarRating('${lessonId}', 2)">★</span>
+                                    <span class="selected" onclick="setStarRating('${lessonId}', 3)">★</span>
+                                    <span class="selected" onclick="setStarRating('${lessonId}', 4)">★</span>
+                                    <span class="selected" onclick="setStarRating('${lessonId}', 5)">★</span>
+                                </div>
+                            </div>
+                            <textarea 
+                                id="feedbackInput_${lessonId}" 
+                                class="feedback-input" 
+                                rows="2" 
+                                placeholder="Was this explanation easy to follow? Mention any confusing terms or great analogies to improve future lessons..."
+                            ></textarea>
+                            <div class="feedback-actions">
+                                <button class="btn-action btn-action-primary" style="padding: 0.35rem 0.8rem; font-size: 0.76rem;" onclick="submitStudentFeedback('${escapeForAttribute(data.topic)}', '${lessonId}')">
+                                    🧠 Submit to Agent Memory
+                                </button>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
             `;
@@ -1411,7 +2102,6 @@
             scrollToBottom();
         }
 
-        // Pipeline stage simulation animation
         function startGenerationProgress(topic) {
             isGenerating = true;
             document.getElementById('btnGenerate').disabled = true;
@@ -1427,7 +2117,6 @@
                 document.getElementById('progressTimer').textContent = `Elapsed: ${elapsedSeconds}s`;
             }, 1000);
 
-            // Stage animation loop
             const stages = ['stage1', 'stage2', 'stage3', 'stage4'];
             stages.forEach(s => {
                 const el = document.getElementById(s);
