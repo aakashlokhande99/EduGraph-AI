@@ -49,8 +49,22 @@ def test_delete_endpoint_and_ui():
     assert "deleteDocument" in html, "deleteDocument function missing in JS"
     assert "toggleSidebar" in html, "toggleSidebar function missing in JS"
     assert "btnCollapseSidebar" in html, "btnCollapseSidebar missing in HTML"
-    print("✅ All HTML and JavaScript hooks verified in index.html")
+    
+    # 6. Verify Theme Switcher (Dark/Light mode) markup & CSS tokens
+    assert "btnToggleTheme" in html, "btnToggleTheme missing in HTML"
+    assert "themeIcon" in html, "themeIcon missing in HTML"
+    assert "themeText" in html, "themeText missing in HTML"
+    assert 'data-theme="dark"' in html, "Dark theme default missing in HTML"
+    assert '[data-theme="light"]' in html, "Light theme CSS rule missing in HTML"
+    assert "toggleTheme" in html, "toggleTheme function missing in JS"
+    assert "applyTheme" in html, "applyTheme function missing in JS"
+    assert "initTheme" in html, "initTheme function missing in JS"
+    assert "hljsTheme" in html, "hljsTheme link ID missing in HTML"
+    assert "#040711" in html, "Dark theme black base color missing in CSS"
+    assert "#f4f8fe" in html, "Light theme white base color missing in CSS"
+    assert "#1d4ed8" in html, "Light theme blue accent color missing in CSS"
+    print("✅ All Dark/Light mode theme hooks and color palettes verified in index.html")
 
 if __name__ == "__main__":
     test_delete_endpoint_and_ui()
-    print("\n🎉 ALL NEW FEATURE TESTS PASSED SUCCESSFULLY!")
+    print("\n🎉 ALL TESTS (DELETE, COLLAPSE, CARD, THEMES) PASSED SUCCESSFULLY!")

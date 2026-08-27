@@ -76,6 +76,7 @@ flowchart TD
 - **Zero-Knowledge Pedagogical Engine**: Translates complex, abstract concepts into concrete, physical-world metaphors and stepwise milestones designed for complete beginners.
 - **4-Agent LangGraph Workflow**: Specialized division of labor with an automated feedback loop between Agent #2 (Content Creator) and Agent #3 (Evaluator).
 - **Shared Persistent Memory**: Continuous cross-agent learning saved in `memory/agent_memory.json` that distills evaluator critiques and student star ratings into actionable avoidance rules.
+- **Dynamic Dark / Light Mode Theming**: One-click theme switcher featuring a curated **Black & Blue** palette for Dark mode (`#040711` / `#38bdf8`) and a crisp **White & Blue** palette for Light mode (`#ffffff` / `#1d4ed8`), with persistent state and dynamic syntax highlighting.
 - **Split-Screen PDF Studio**: Real-time PDF preview right inside the browser alongside the generation chat.
 - **Document Management**: Manage generated lessons with instant search, smooth collapse/expand navigation, and direct file deletion.
 - **Clean Response Cards**: Streamlined completion cards showing concept milestones with immediate PDF actions and student feedback inputs.
@@ -169,9 +170,13 @@ Open your browser at **[http://127.0.0.1:8000](http://127.0.0.1:8000)**.
 
 ## 🧪 Running Tests
 
-Run the automated test suite verifying memory persistence, API endpoints, and document deletion:
+Run the automated test suites verifying memory persistence, API endpoints, document deletion, and UI theme functionality:
 ```bash
+# Verify shared persistent memory and LangGraph agent distillation
 python test_memory_system.py
+
+# Verify document deletion, collapse navigation, and Dark/Light mode theme system
+python test_new_features.py
 ```
 
 ---
